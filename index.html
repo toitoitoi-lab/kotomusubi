@@ -14,11 +14,19 @@
   --accent:#1f4e79; --accent-ink:#ffffff; --hot:#b3261e; --ok:#1b6e3c; --focus:#ff9800;
   --tile:#eef4fb; --tile-sel:#d6e6f8; --tile-min:64px;
 }
-:root[data-theme="high"]{
-  --bg:#000; --panel:#000; --ink:#fff; --sub:#ffeb3b; --line:#fff;
-  --accent:#ffeb3b; --accent-ink:#000; --hot:#ff8a80; --ok:#69f0ae; --focus:#00e5ff;
-  --tile:#111; --tile-sel:#333;
+:root{--hdr-bg:var(--accent);--hdr-ink:var(--accent-ink);--sel-bg:var(--accent);--sel-ink:var(--accent-ink);--sel-bd:var(--accent);--attn-bg:#ffeb3b;--attn-ink:#000;--help-bg:#fff;--help-ink:var(--hot)}
+:root[data-theme="high"],:root[data-theme="cyan"]{
+  --bg:#000; --panel:#000; --ink:#fff; --sub:#d0d0d0; --line:#9a9a9a;
+  --hot:#ff8a80; --ok:#69f0ae;
+  --tile:#121212; --tile-sel:#262626;
+  --accent-ink:#000;
+  --hdr-bg:#000; --hdr-ink:#fff; --sel-bg:#262626; --sel-bd:var(--accent); --sel-ink:var(--accent);
+  --help-bg:#ff8a80; --help-ink:#000;
 }
+:root[data-theme="high"]{--accent:#ffd54a;--focus:#00e5ff;--attn-bg:#ffd54a}
+:root[data-theme="cyan"]{--accent:#5fd9ee;--focus:#ffd54a;--attn-bg:#5fd9ee}
+:root[data-theme="high"] header.top,:root[data-theme="cyan"] header.top{border-bottom:3px solid var(--accent)}
+:root[data-theme="high"] .chip[aria-pressed="true"],:root[data-theme="cyan"] .chip[aria-pressed="true"]{box-shadow:inset 0 0 0 2px var(--sel-bd)}
 *{box-sizing:border-box}
 html{font-size:20px}
 html[data-size="M"]{font-size:16px}
@@ -32,15 +40,14 @@ button:focus-visible,select:focus-visible,input:focus-visible,textarea:focus-vis
 ruby rt{font-size:.5em}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
 #app{display:flex;flex-direction:column;height:100dvh}
-header.top{display:flex;gap:.4rem;align-items:center;padding:.4rem .6rem;background:var(--accent);color:var(--accent-ink);flex-wrap:wrap}
+header.top{display:flex;gap:.4rem;align-items:center;padding:.4rem .6rem;background:var(--hdr-bg);color:var(--hdr-ink);flex-wrap:wrap}
 header.top h1{font-size:1.05rem;margin:0 .4rem 0 0;white-space:nowrap}
 header.top h1 small{font-weight:normal;font-size:.6em;opacity:.85;margin-left:.3em}
 .sp{flex:1}
-.hbtn{border:2px solid var(--accent-ink);background:transparent;color:var(--accent-ink);border-radius:.6rem;padding:.3rem .7rem;min-height:44px;font-weight:600}
-.hbtn[aria-pressed="true"],.hbtn[aria-expanded="true"]{background:var(--accent-ink);color:var(--accent)}
-.hbtn.attn{background:#ffeb3b;color:#000;border-color:#ffeb3b}
-.hbtn.help{background:#fff;color:var(--hot);border-color:#fff}
-:root[data-theme="high"] .hbtn.help{color:#000;background:#ff8a80;border-color:#ff8a80}
+.hbtn{border:2px solid var(--hdr-ink);background:transparent;color:var(--hdr-ink);border-radius:.6rem;padding:.3rem .7rem;min-height:44px;font-weight:600}
+.hbtn[aria-pressed="true"],.hbtn[aria-expanded="true"]{background:var(--hdr-ink);color:var(--hdr-bg)}
+.hbtn.attn{background:var(--attn-bg);color:var(--attn-ink);border-color:var(--attn-bg)}
+.hbtn.help{background:var(--help-bg);color:var(--help-ink);border-color:var(--help-bg)}
 main{flex:1;min-height:0;display:grid;gap:.5rem;padding:.5rem}
 main.d3{grid-template-columns:minmax(200px,260px) 1fr minmax(280px,380px)}
 main.t2l{grid-template-columns:1fr minmax(260px,380px)}
@@ -51,7 +58,7 @@ main.p1{grid-template-columns:1fr;padding:.4rem;padding-bottom:0}
 .list{display:flex;flex-direction:column;gap:.35rem}
 .chips{display:flex;flex-wrap:wrap;gap:.35rem}
 .chip{border:2px solid var(--line);background:var(--tile);border-radius:.6rem;padding:.35rem .7rem;min-height:44px;text-align:left}
-.chip[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);font-weight:700}
+.chip[aria-pressed="true"]{background:var(--sel-bg);color:var(--sel-ink);border-color:var(--sel-bd);font-weight:700}
 .nav{display:flex;flex-direction:column;gap:.6rem}
 .grid{display:grid;gap:.5rem;grid-template-columns:repeat(auto-fill,minmax(min(100%,calc(var(--tile-min)*3.6)),1fr))}
 .tile{display:flex;align-items:center;gap:.5rem;min-height:calc(var(--tile-min) + .6rem);border:2px solid var(--line);background:var(--tile);border-radius:.8rem;padding:.5rem .7rem;text-align:left;position:relative}
@@ -63,14 +70,17 @@ main.p1{grid-template-columns:1fr;padding:.4rem;padding-bottom:0}
 .pager{display:flex;gap:.4rem;align-items:center;margin:.5rem 0 0}
 .pager .pg{color:var(--sub);flex:1;text-align:center}
 .btn{border:2px solid var(--accent);background:var(--panel);color:var(--accent);border-radius:.7rem;padding:.4rem .9rem;min-height:48px;font-weight:700}
-:root[data-theme="high"] .btn{color:var(--ink);border-color:var(--ink)}
+:root[data-theme="high"] .btn,:root[data-theme="cyan"] .btn{color:var(--ink);border-color:var(--ink)}
+:root[data-theme="high"] .btn.pri,:root[data-theme="cyan"] .btn.pri{background:var(--accent);color:#000;border-color:var(--accent)}
+:root[data-theme="high"] .btn.danger,:root[data-theme="cyan"] .btn.danger{color:var(--hot);border-color:var(--hot)}
 .btn.pri{background:var(--accent);color:var(--accent-ink)}
 .btn.danger{border-color:var(--hot);color:var(--hot)}
 .btn[disabled]{opacity:.4;cursor:not-allowed}
 .btn.small{min-height:40px;padding:.2rem .6rem;font-size:.85rem}
 .sentence{font-size:1.6rem;font-weight:700;min-height:6rem;padding:.6rem;border:3px dashed var(--line);border-radius:.8rem;margin:.3rem 0 .6rem;display:flex;gap:.5rem;align-items:center}
 .sentence.empty{color:var(--sub);font-weight:400;font-size:1rem}
-.sentence .ic{font-size:1.4em}
+.sentence .ic{font-size:1.4em;flex:none}
+.sentence span{min-width:0;overflow-wrap:anywhere}
 .row{display:flex;gap:.4rem;flex-wrap:wrap;margin:.3rem 0}
 .row .btn.big{flex:1;font-size:1.2rem;min-height:60px}
 .hold{position:relative;overflow:hidden}
@@ -99,6 +109,14 @@ select,input[type=text],input[type=tel],input[type=email],textarea{font:inherit;
 details{margin:.5rem 0;border:1px solid var(--line);border-radius:.6rem;padding:.3rem .6rem}
 summary{cursor:pointer;font-weight:700;min-height:40px;display:flex;align-items:center}
 .tabs{display:flex;gap:.3rem;flex-wrap:wrap;margin-bottom:.5rem}
+.modes{display:flex;gap:.4rem;padding:.3rem .5rem 0}
+.board{display:grid;gap:.35rem;margin:.4rem 0}
+.board.c10{grid-template-columns:repeat(10,minmax(0,1fr))}
+.board.c5{grid-template-columns:repeat(5,minmax(0,1fr))}
+.board.fnrow{grid-template-columns:repeat(auto-fit,minmax(3rem,1fr))}
+.key{border:2px solid var(--line);background:var(--tile);border-radius:.6rem;min-height:calc(var(--tile-min) - 4px);font-size:1.3rem;font-weight:700}
+.key.fn{font-size:.85rem;background:var(--panel)}
+textarea#buf{resize:vertical}
 .item{display:flex;gap:.3rem;align-items:stretch;margin-bottom:.4rem}
 .item .tile{flex:1}
 .item .ctl{display:flex;flex-direction:column;gap:.2rem}
@@ -129,7 +147,7 @@ summary{cursor:pointer;font-weight:700;min-height:40px;display:flex;align-items:
 
 <script>
 "use strict";
-const VERSION="0.1", VARIANT="public";
+const VERSION="0.2.1", VARIANT="public";
 
 /* ---------- 文言（日本語／English） ---------- */
 const T={
@@ -148,7 +166,7 @@ ja:{
  shareDone:"おくる画面を ひらきました",copied:"コピーしました",
  settings:"せってい",lang:"ことば（言語）",script:"もじ",scripts:{hira:"ひらがな",kanji:"漢字かな",ruby:"漢字＋ふりがな"},
  device:"つかう端末",devs:{desktop:"デスクトップ",laptop:"ラップトップ",tablet:"タブレット",phone:"スマートフォン"},
- devAuto:"自動で えらぶ",size:"もじの 大きさ",theme:"配色",themes:{normal:"ふつう",high:"ハイコントラスト"},
+ devAuto:"自動で えらぶ",size:"もじの 大きさ",theme:"配色",themes:{normal:"ふつう",high:"ハイコントラスト（黒×黄）",cyan:"ハイコントラスト（黒×水色）"},
  icons:"アイコンを 出す",confirm:"はなす前に 確認する",rate:"はなす はやさ",perPage:"候補の数",volume:"よびかけの 音",
  vols:["小","中","大"],auto:"自動",contacts:"たすけを よぶ 相手（この端末にだけ 保存）",cName:"名前",cTel:"電話番号",cSms:"SMS の宛先",cMail:"メール",
  data:"書き出し・読み込み",exportJson:"JSON で 書き出す",exportCsv:"CSV で 書き出す",inclContacts:"よぶ相手も 含める",
@@ -160,7 +178,14 @@ ja:{
  freq:"よく使った",print:"印刷",del:"けす",up:"上へ",down:"下へ",noItems:"まだ ありません。",
  defBook:"わたしの ことば帖",confirmDel:"本当に けしますか？",loading:"よみこみ中…",loadErr:"辞書を 読み込めませんでした。公開URLから ひらくか、private 版を つかってください。",
  pickRole:"たちばを えらぶ",page:"ページ",showClose:"がめんを タップすると もどります",
- helpMore:"せつめい"
+ helpMore:"せつめい",
+ modePick:"えらぶ",modeMake:"つくる",bufLabel:"じぶんの ことばを つくる",bufPh:"ここに ことばが できます",
+ predTitle:"よそう",tilesTitle:"ことばタイル（この ばめんの ことば）",sceneFor:"ばめん（よそう・タイルに つかう）",
+ kdel:"1もじ けす",kclr:"ぜんぶ けす",kspace:"あき",kdaku:"゛゜",ksmall:"小",kback:"ぎょうを えらびなおす",
+ compose:"つくる 入力",composeOpts:{pick:"えらぶ だけ",both:"えらぶ ＋ つくる"},predict:"よそうの 数",kana:"50音ばんの ひょうじ",
+ kanaOpts:{auto:"自動（スマホは 2 だん）",full:"ぜんぶ 出す",step2:"行 → もじ の 2 だん"},
+ composeNote:"つくった ことばは 記録しません。ことば帖に 入れたときだけ 保存します。",
+ voiceJa:"日本語の 声",voiceEn:"英語の 声",voiceAuto:"自動（よい声を えらぶ）",voiceTest:"きいてみる",voiceNone:"この端末には 声が ありません",
 },
 en:{
  app:"KOTOMUSUBI",tag:"Words that connect.",role:"Who",scene:"Where",intent:"What for",level:"Strength",
@@ -177,7 +202,7 @@ en:{
  shareDone:"Share sheet opened",copied:"Copied",
  settings:"Settings",lang:"Language",script:"Japanese text",scripts:{hira:"Hiragana",kanji:"Kanji + kana",ruby:"Kanji + furigana"},
  device:"Device",devs:{desktop:"Desktop",laptop:"Laptop",tablet:"Tablet",phone:"Smartphone"},
- devAuto:"Choose automatically",size:"Text size",theme:"Colors",themes:{normal:"Normal",high:"High contrast"},
+ devAuto:"Choose automatically",size:"Text size",theme:"Colors",themes:{normal:"Normal",high:"High contrast (black/yellow)",cyan:"High contrast (black/cyan)"},
  icons:"Show icons",confirm:"Confirm before speaking",rate:"Speech speed",perPage:"Choices per page",volume:"Attention sound",
  vols:["Low","Mid","High"],auto:"Auto",contacts:"People to call for help (stored on this device only)",cName:"Name",cTel:"Phone",cSms:"SMS number",cMail:"Email",
  data:"Export / Import",exportJson:"Export as JSON",exportCsv:"Export as CSV",inclContacts:"Include help contacts",
@@ -189,7 +214,14 @@ en:{
  freq:"Most used",print:"Print",del:"Delete",up:"Up",down:"Down",noItems:"Nothing yet.",
  defBook:"My phrasebook",confirmDel:"Delete it?",loading:"Loading…",loadErr:"Could not load the dictionary. Open the public URL or use the private build.",
  pickRole:"Choose who you are",page:"Page",showClose:"Tap the screen to go back",
- helpMore:"Details"
+ helpMore:"Details",
+ modePick:"Choose",modeMake:"Compose",bufLabel:"Make your own words",bufPh:"Your words appear here",
+ predTitle:"Suggestions",tilesTitle:"",sceneFor:"Scene (for suggestions)",
+ kdel:"Delete",kclr:"Clear all",kspace:"Space",kdaku:"",ksmall:"",kback:"",
+ compose:"Compose input",composeOpts:{pick:"Choose only",both:"Choose + Compose"},predict:"Suggestions",kana:"Kana board",
+ kanaOpts:{auto:"Auto",full:"Full",step2:"2 steps"},
+ composeNote:"Composed text is not recorded. It is saved only when you add it to a phrasebook.",
+ voiceJa:"Japanese voice",voiceEn:"English voice",voiceAuto:"Auto (pick a good voice)",voiceTest:"Listen",voiceNone:"No voices on this device",
 }};
 
 /* ---------- 保存 ---------- */
@@ -198,7 +230,7 @@ const store={
  get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return k in mem?mem[k]:d}},
  set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){mem[k]=v}}
 };
-const DEF_PROFILE={lang:"ja",script:"hira",size:"L",theme:"normal",icons:true,confirm:true,rate:0.9,perPage:"auto",volume:1,role:"highschool"};
+const DEF_PROFILE={lang:"ja",script:"hira",size:"L",theme:"normal",icons:true,confirm:true,rate:0.9,perPage:"auto",volume:1,role:"highschool",compose:"both",predict:5,kana:"auto",voiceJa:"",voiceEn:""};
 let P=Object.assign({},DEF_PROFILE,store.get("km.profile",{}));
 let DEV=store.get("km.device",{type:null,auto:true});
 let BOOKS=store.get("km.books",null);
@@ -273,7 +305,7 @@ const label=o=>disp({hira:o.hira,ruby:o.ruby,en:o.en});
 const isHeavy=e=>e&&((e.intent==="trouble"&&e.level===3)||(e.role==="counsel"&&(e.level===3||e.intent==="trouble"||e.intent==="feeling")));
 
 /* ---------- 状態 ---------- */
-const S={open:{},scene:null,intent:"request",level:0,page:0,step:"scene",sel:null,panel:null,book:null,edit:false,form:false,speaking:false,loading:true,err:false,msg:""};
+const S={mode:"pick",buf:"",caret:0,row:null,bufTA:false,open:{},scene:null,intent:"request",level:0,page:0,step:"scene",sel:null,panel:null,book:null,edit:false,form:false,speaking:false,loading:true,err:false,msg:""};
 let attnTimer=null,audioCtx=null,holdTimer=null;
 
 /* ---------- 帖 ---------- */
@@ -291,9 +323,29 @@ function addToBook(e){
 
 /* ---------- 音声 ---------- */
 let voices=[];
-function refreshVoices(){try{voices=speechSynthesis.getVoices()}catch(e){voices=[]}}
+function refreshVoices(){try{voices=speechSynthesis.getVoices()}catch(e){voices=[]} if(typeof S!=="undefined"&&S.panel==="settings"&&typeof render==="function"&&!document.activeElement.matches("select,input")) render()}
 if("speechSynthesis" in window){refreshVoices();speechSynthesis.addEventListener&&speechSynthesis.addEventListener("voiceschanged",refreshVoices)}
 const ttsOK=()=>"speechSynthesis" in window&&"SpeechSynthesisUtterance" in window;
+function voiceScore(v){
+  const n=(v.name||"").toLowerCase(); let sc=0;
+  if(/natural|neural|online/.test(n)) sc+=6;
+  if(/enhanced|premium|siri/.test(n)) sc+=5;
+  if(/google/.test(n)) sc+=3;
+  if(/samantha|aria|jenny|guy|ava|allison|karen|daniel|kyoko|otoya|nanami|keita|haruka/.test(n)) sc+=2;
+  if(/compact|espeak|novelty|whisper|bad|bells|boing|cellos|zarvox|trinoids|organ|jester|hysterical/.test(n)) sc-=8;
+  if(v.localService===false) sc+=1;
+  return sc;
+}
+function voicesFor(lang){
+  const pre=lang.slice(0,2).toLowerCase();
+  return voices.filter(v=>v.lang&&v.lang.toLowerCase().replace("_","-").startsWith(pre)).sort((a,b)=>voiceScore(b)-voiceScore(a));
+}
+function pickVoice(lang){
+  const list=voicesFor(lang); const saved=lang.startsWith("en")?P.voiceEn:P.voiceJa;
+  if(saved){const v=list.find(v=>v.voiceURI===saved||v.name===saved); if(v) return v}
+  const exact=list.filter(v=>v.lang.toLowerCase().replace("_","-")===lang.toLowerCase());
+  return (exact[0]&&voiceScore(exact[0])>=voiceScore(list[0])-1?exact[0]:list[0])||null;
+}
 function speak(e){
   if(!e) return;
   recordUse(e);
@@ -301,14 +353,18 @@ function speak(e){
   try{
     speechSynthesis.cancel();
     const u=new SpeechSynthesisUtterance(speakText(e));
-    const lang=P.lang==="en"?"en-US":"ja-JP"; u.lang=lang; u.rate=+P.rate;
-    const v=voices.find(v=>v.lang&&v.lang.replace("_","-").toLowerCase().startsWith(lang.slice(0,2).toLowerCase())&&v.lang.toLowerCase().includes(lang.slice(3).toLowerCase()))||voices.find(v=>v.lang&&v.lang.toLowerCase().startsWith(lang.slice(0,2)));
-    if(v) u.voice=v;
+    const lang=P.lang==="en"?"en-US":"ja-JP"; u.lang=lang; u.rate=P.lang==="en"?Math.max(+P.rate,0.95):+P.rate;
+    const v=pickVoice(lang); if(v){u.voice=v; u.lang=v.lang}
     u.onstart=()=>{S.speaking=true;render()};
     u.onend=u.onerror=()=>{S.speaking=false;render()};
     S.speaking=true; speechSynthesis.speak(u);
   }catch(err){S.panel="show";S.msg=t("noTTS")}
   render();
+}
+function testVoice(lang){
+  if(!ttsOK()) return;
+  try{ speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(lang==="en"?"Hello. Nice to meet you.":"こんにちは。よろしく おねがいします。");
+    const L=lang==="en"?"en-US":"ja-JP"; u.lang=L; u.rate=lang==="en"?Math.max(+P.rate,0.95):+P.rate; const v=pickVoice(L); if(v){u.voice=v;u.lang=v.lang} speechSynthesis.speak(u)}catch(e){}
 }
 function stopSpeak(){try{speechSynthesis.cancel()}catch(e){} S.speaking=false;render()}
 function recordUse(e){
@@ -428,6 +484,106 @@ function printBook(){
   setTimeout(()=>window.print(),50);
 }
 
+/* ---------- つくる（50音盤・予測・ことばタイル） ---------- */
+const ROWS=[["あ","い","う","え","お"],["か","き","く","け","こ"],["さ","し","す","せ","そ"],["た","ち","つ","て","と"],["な","に","ぬ","ね","の"],["は","ひ","ふ","へ","ほ"],["ま","み","む","め","も"],["や","","ゆ","","よ"],["ら","り","る","れ","ろ"],["わ","","を","","ん"]];
+const DAKU=["かがか","きぎき","くぐく","けげけ","こごこ","さざさ","しじし","すずす","せぜせ","そぞそ","ただた","ちぢち","つづっつ","てでて","とどと","はばぱは","ひびぴひ","ふぶぷふ","へべぺへ","ほぼぽほ","うゔう"].map(x=>[...x]);
+const SMALL=[["あ","ぁ"],["い","ぃ"],["う","ぅ"],["え","ぇ"],["お","ぉ"],["つ","っ"],["や","ゃ"],["ゆ","ゅ"],["よ","ょ"],["わ","ゎ"]];
+function cycleChar(c){
+  for(const g of DAKU){const i=g.indexOf(c); if(i>=0&&i<g.length-1) return g[i+1]; if(i===g.length-1) return g[0]}
+  for(const [a,b] of SMALL){ if(c===a) return b; if(c===b) return a }
+  return null;
+}
+const useBoard=()=>P.lang==="ja";
+function kanaMode(){ if(P.kana==="full") return "full"; if(P.kana==="step2") return "step2"; return devType()==="phone"?"step2":"full"; }
+function syncFree(){
+  const tx=S.buf.trim();
+  S.sel=tx?{id:"free",free:true,hira:P.lang==="en"?tx:readingOf(tx),ruby:tx,en:P.lang==="en"?tx:"",icon:"✏️",intent:"",scene:"",role:null}:null;
+}
+function insertText(x){
+  const c=Math.min(S.caret,S.buf.length);
+  S.buf=S.buf.slice(0,c)+x+S.buf.slice(c); S.caret=c+x.length; syncFree();
+}
+function deleteBack(){
+  const c=Math.min(S.caret,S.buf.length); if(c<=0) return;
+  const a=[...S.buf.slice(0,c)]; a.pop(); const head=a.join("");
+  S.buf=head+S.buf.slice(c); S.caret=head.length; syncFree();
+}
+function cycleLast(){
+  const c=Math.min(S.caret,S.buf.length); if(c<=0) return;
+  const ch=S.buf[c-1], n=cycleChar(ch); if(!n) return;
+  S.buf=S.buf.slice(0,c-1)+n+S.buf.slice(c); syncFree();
+}
+function sceneExprs(){return (CACHE[P.role]||[]).filter(e=>e.scene===S.scene)}
+function predictions(){
+  const n=+P.predict; if(!n||!S.buf.trim()) return [];
+  const key=S.buf.replace(/\s/g,""); if(!key) return [];
+  const seen=new Set(), out=[];
+  const pool=[];
+  BOOKS.forEach(b=>b.items.forEach(i=>pool.push(i)));
+  Object.values(USAGE).forEach(u=>pool.push(u));
+  sceneExprs().forEach(e=>pool.push(e));
+  for(const e of pool){
+    const h=e.hira.replace(/\s/g,""), k=stripRuby(e.ruby).replace(/\s/g,"");
+    if(h===key||k===key) continue;
+    if(!(h.startsWith(key)||k.startsWith(key))) continue;
+    if(seen.has(e.hira)) continue; seen.add(e.hira); out.push(e);
+    if(out.length>=n) break;
+  }
+  return out;
+}
+function tiles(){
+  const cnt=new Map();
+  sceneExprs().forEach(e=>{
+    const h=e.hira.split(" "), r=e.ruby.split(" ");
+    h.forEach((w,i)=>{ if(w.length<2) return; const o=cnt.get(w)||{hira:w,ruby:r[i]||w,n:0}; o.n++; cnt.set(w,o)});
+  });
+  return [...cnt.values()].sort((a,b)=>b.n-a.n||a.hira.length-b.hira.length).slice(0,14);
+}
+function predHTML(){
+  const ps=predictions(); if(!ps.length) return "";
+  return `<h2>${t("predTitle")}</h2><div class="chips">${ps.map((e,i)=>`<button class="chip" data-act="kpred" data-i="${i}" data-key="kp${i}">${disp(e)}</button>`).join("")}</div>`;
+}
+function boardHTML(){
+  const mode=kanaMode();
+  const act=(label,a,extra="")=>`<button class="key fn" data-act="${a}" data-key="k-${a}" ${extra}>${label}</button>`;
+  const fnrow=`<div class="board fnrow">${act("⌫","kdel",`aria-label="${t("kdel")}"`)}${act("゛ ゜","kdaku",'aria-label="だくてん・はんだくてん"')}${act("小","ksmall",'aria-label="ちいさい もじ"')}${act("ー","kword","data-w=\"ー\"")}${act("、","kword","data-w=\"、\"")}${act("。","kword","data-w=\"。\"")}${act("？","kword","data-w=\"？\"")}${act("！","kword","data-w=\"！\"")}${act("␣","kword","data-w=\" \" aria-label=\""+t("kspace")+"\"")}</div>`;
+  let body="";
+  if(mode==="step2"){
+    if(S.row===null){
+      body=`<div class="board c5">${ROWS.map((r,i)=>`<button class="key" data-act="krow" data-i="${i}" data-key="kr${i}">${r[0]}</button>`).join("")}</div>`;
+    }else{
+      body=`<div class="board c5">${ROWS[S.row].map(c=>c?`<button class="key" data-act="kana" data-c="${c}" data-key="k-${c}">${c}</button>`:`<span></span>`).join("")}</div><div class="row"><button class="btn small" data-act="kback" data-key="k-back">◀ ${t("kback")}</button></div>`;
+    }
+  }else{
+    const cells=[]; for(let v=0;v<5;v++) for(let r=0;r<10;r++) cells.push(ROWS[r][v]);
+    body=`<div class="board c10">${cells.map(c=>c?`<button class="key" data-act="kana" data-c="${c}" data-key="k-${c}">${c}</button>`:`<span></span>`).join("")}</div>`;
+  }
+  return body+fnrow;
+}
+function composeHTML(){
+  const scenes=scenesOf(P.role);
+  const tl=useBoard()?tiles():[];
+  const actions=`<div class="row"><button class="btn" data-act="kclr" data-key="k-clr">${t("kclr")}</button>${layoutOf()==="p1"?`<button class="btn" data-act="addbook" ${S.sel?"":"disabled"}>＋ ${t("addTo")}</button>`:""}</div>`;
+  return `<h2>${t("bufLabel")}</h2>
+   <textarea id="buf" rows="2" aria-label="${t("bufLabel")}" placeholder="${t("bufPh")}" inputmode="${useBoard()&&kanaMode()!=="ime"?"none":"text"}" style="font-size:1.3rem">${esc(S.buf)}</textarea>
+   ${actions}
+   <div id="predbox">${predHTML()}</div>
+   ${useBoard()?`<h2>50</h2>${boardHTML()}`:""}
+   ${tl.length?`<h2>${t("tilesTitle")}</h2><div class="chips">${tl.map((o,i)=>`<button class="chip" data-act="ktile" data-i="${i}" data-key="kt${i}">${disp({hira:o.hira,ruby:o.ruby,en:""})}</button>`).join("")}</div>`:""}
+   <label class="f" for="c-scene">${t("sceneFor")}</label><select id="c-scene">${scenes.map(sc=>`<option value="${sc.id}" ${S.scene===sc.id?"selected":""}>${esc(plain({hira:sc.hira,ruby:sc.ruby,en:sc.en}))}</option>`).join("")}</select>
+   <p class="note">${t("composeNote")}</p>`;
+}
+function modesHTML(){
+  if(P.compose==="pick"||S.loading||S.err) return "";
+  return `<div class="modes" role="group" aria-label="にゅうりょく"><button class="chip" data-act="mode" data-id="pick" data-key="m-pick" aria-pressed="${S.mode==="pick"}">${t("modePick")}</button><button class="chip" data-act="mode" data-id="make" data-key="m-make" aria-pressed="${S.mode==="make"}">✏️ ${t("modeMake")}</button></div>`;
+}
+function updateLive(){
+  syncFree();
+  const sb=document.getElementById("sentbox"); if(sb) sb.innerHTML=sentenceInner();
+  const pb=document.getElementById("predbox"); if(pb) pb.innerHTML=predHTML();
+  const bar=document.getElementById("bar"); if(bar) bar.outerHTML=barHTML();
+}
+
 /* ---------- 描画 ---------- */
 const $a=document.getElementById("app"), $p=document.getElementById("printArea");
 function currentCandidates(){
@@ -465,7 +621,8 @@ function speakBtn(big){
   if(heavy) return `<button class="btn pri hold ${big?"big":""}" data-act="speakHold" ${dis} aria-describedby="heavyNote">🔊 ${t("speak")}（${t("hold")}）</button>`;
   return `<button class="btn pri ${big?"big":""}" data-act="speak" ${dis}>🔊 ${t("speak")}</button>`;
 }
-function sentencePane(){
+function sentencePane(){ return `<div id="sentbox">${sentenceInner()}</div>` }
+function sentenceInner(){
   const e=S.sel;
   const body=e?`<div class="sentence">${P.icons?`<span class="ic">${esc(e.icon)}</span>`:""}<span>${disp(e)}</span></div>`
               :`<div class="sentence empty">${t("empty")}</div>`;
@@ -495,6 +652,12 @@ function mainHTML(){
   if(S.loading) return `<main class="p1"><div class="pane">${t("loading")}</div></main>`;
   if(S.err) return `<main class="p1"><div class="pane warn">${t("loadErr")}</div></main>`;
   const L=layoutOf();
+  if(S.mode==="make"){
+    if(L==="d3") return `<main class="d3"><div class="pane">${navHTML("scene")}</div><div class="pane">${composeHTML()}</div><div class="pane">${sentencePane()}</div></main>`;
+    if(L==="t2l") return `<main class="t2l"><div class="pane">${composeHTML()}</div><div class="pane">${sentencePane()}</div></main>`;
+    if(L==="t2p") return `<main class="t2p"><div class="pane" style="max-height:34dvh">${sentencePane()}</div><div class="pane">${composeHTML()}</div></main>`;
+    return `<main class="p1"><div class="pane">${composeHTML()}</div></main>`;
+  }
   if(L==="d3") return `<main class="d3"><div class="pane">${navHTML()}</div><div class="pane">${candHTML()}</div><div class="pane">${sentencePane()}</div></main>`;
   if(L==="t2l") return `<main class="t2l"><div class="pane">${navHTML()}<hr>${candHTML()}</div><div class="pane">${sentencePane()}</div></main>`;
   if(L==="t2p") return `<main class="t2p"><div class="pane" style="max-height:34dvh">${sentencePane()}</div><div class="pane">${navHTML()}<hr>${candHTML()}</div></main>`;
@@ -508,7 +671,8 @@ function mainHTML(){
 }
 function barHTML(){
   if(layoutOf()!=="p1"||S.loading||S.err) return "";
-  return `<nav class="bar" aria-label="操作"><button class="btn" data-act="phback" ${S.step==="scene"?"disabled":""}>◀ ${t("back")}</button>
+  if(S.mode==="make") return `<nav class="bar" id="bar" aria-label="操作"><button class="btn" data-act="mode" data-id="pick">◀ ${t("modePick")}</button><button class="btn pri" data-act="speak" ${S.sel?"":"disabled"}>🔊 ${t("speak")}</button><button class="btn" data-act="fav">★ ${t("fav")}</button></nav>`;
+  return `<nav class="bar" id="bar" aria-label="操作"><button class="btn" data-act="phback" ${S.step==="scene"?"disabled":""}>◀ ${t("back")}</button>
    ${isHeavy(S.sel)?`<button class="btn pri hold" data-act="speakHold" ${S.sel?"":"disabled"}>🔊 ${t("speak")}（${t("hold")}）</button>`:`<button class="btn pri" data-act="speak" ${S.sel?"":"disabled"}>🔊 ${t("speak")}</button>`}
    <button class="btn" data-act="fav">★ ${t("fav")}</button></nav>`;
 }
@@ -549,6 +713,10 @@ function panelHTML(){
   }
   return "";
 }
+function voiceOpts(lang,cur){
+  const list=voicesFor(lang); if(!list.length) return `<option value="">${t("voiceNone")}</option>`;
+  return opt("",cur||"",t("voiceAuto"))+list.map(v=>opt(v.voiceURI||v.name,cur,v.name+" ("+v.lang+")")).join("");
+}
 function opt(v,cur,txt){return `<option value="${v}" ${String(cur)===String(v)?"selected":""}>${esc(txt)}</option>`}
 function chk(id,cur,txt){return `<label class="f"><input type="checkbox" id="${id}" ${cur?"checked":""}> ${txt}</label>`}
 function settingsHTML(){
@@ -562,9 +730,14 @@ function settingsHTML(){
    <div><label class="f" for="s-script">${t("script")}</label><select id="s-script">${["hira","kanji","ruby"].map(k=>opt(k,P.script,t("scripts")[k])).join("")}</select></div>
    <div><label class="f" for="s-dev">${t("device")}</label><select id="s-dev">${opt("auto",DEV.auto?"auto":DEV.type,t("devAuto")+"（"+t("devs")[detectDevice()]+"）")}${["desktop","laptop","tablet","phone"].map(k=>opt(k,DEV.auto?"auto":DEV.type,t("devs")[k])).join("")}</select></div>
    <div><label class="f" for="s-size">${t("size")}</label><select id="s-size">${["M","L","XL"].map(k=>opt(k,P.size,k)).join("")}</select></div>
-   <div><label class="f" for="s-theme">${t("theme")}</label><select id="s-theme">${["normal","high"].map(k=>opt(k,P.theme,t("themes")[k])).join("")}</select></div>
+   <div><label class="f" for="s-theme">${t("theme")}</label><select id="s-theme">${["normal","high","cyan"].map(k=>opt(k,P.theme,t("themes")[k])).join("")}</select></div>
    <div><label class="f" for="s-per">${t("perPage")}</label><select id="s-per">${opt("auto",P.perPage,t("auto"))}${[4,6,8,12].map(k=>opt(k,P.perPage,k)).join("")}</select></div>
    <div><label class="f" for="s-rate">${t("rate")}（${P.rate}）</label><input type="range" id="s-rate" min="0.5" max="1.3" step="0.1" value="${P.rate}" style="width:100%"></div>
+   <div><label class="f" for="s-compose">${t("compose")}</label><select id="s-compose">${["pick","both"].map(k=>opt(k,P.compose,t("composeOpts")[k])).join("")}</select></div>
+   <div><label class="f" for="s-predict">${t("predict")}</label><select id="s-predict">${[0,3,5,8].map(k=>opt(k,P.predict,k)).join("")}</select></div>
+   <div><label class="f" for="s-kana">${t("kana")}</label><select id="s-kana">${["auto","full","step2"].map(k=>opt(k,P.kana,t("kanaOpts")[k])).join("")}</select></div>
+   <div><label class="f" for="s-vja">${t("voiceJa")}</label><select id="s-vja">${voiceOpts("ja-JP",P.voiceJa)}</select><button class="btn small" data-act="vtest" data-id="ja" style="margin-top:.3rem">🔊 ${t("voiceTest")}</button></div>
+   <div><label class="f" for="s-ven">${t("voiceEn")}</label><select id="s-ven">${voiceOpts("en-US",P.voiceEn)}</select><button class="btn small" data-act="vtest" data-id="en" style="margin-top:.3rem">🔊 ${t("voiceTest")}</button></div>
    <div><label class="f" for="s-vol">${t("volume")}</label><select id="s-vol">${t("vols").map((v,i)=>opt(i,P.volume,v)).join("")}</select></div>
   </div>
   ${chk("s-icons",P.icons,t("icons"))}${chk("s-confirm",P.confirm,t("confirm"))}
@@ -605,10 +778,11 @@ function render(){
   document.documentElement.dataset.theme=P.theme; document.documentElement.dataset.size=P.size;
   document.documentElement.lang=P.lang;
   document.documentElement.style.setProperty("--tile-min",tileMin()+"px");
-  $a.innerHTML=headerHTML()+(INDEX?mainHTML():`<main class="p1"><div class="pane">${t("loading")}</div></main>`)+barHTML()+(INDEX?panelHTML():"");
+  $a.innerHTML=headerHTML()+modesHTML()+(INDEX?mainHTML():`<main class="p1"><div class="pane">${t("loading")}</div></main>`)+barHTML()+(INDEX?panelHTML():"");
   if(lastKey){const el=$a.querySelector(`[data-key="${lastKey}"]`); if(el&&!typing) el.focus({preventScroll:true})}
   const f=$a.querySelector('.overlay [data-key="p-close"], .full [data-key="p-close"]');
   if(f&&!lastKey) f.focus();
+  const ta=document.getElementById("buf"); if(ta){ try{ta.setSelectionRange(S.caret,S.caret)}catch(e){} }
   const hs=$a.querySelectorAll("details[data-auto]"); hs.forEach(d=>{ if(!d.dataset.set){d.dataset.set=1} });
 }
 
@@ -642,7 +816,18 @@ document.addEventListener("click",ev=>{
   case "showmode": S.panel="show";render();break;
   case "send": sendSel();break;
   case "addbook": if(S.sel){const ok=addToBook(S.sel);S.msg=ok?"★ "+curBook().name:"";render();setTimeout(()=>{S.msg="";render()},1800)}break;
-  case "clearsel": S.sel=null;render();break;
+  case "clearsel": S.sel=null; if(S.mode==="make"){S.buf="";S.caret=0} render(); break;
+  case "mode": S.mode=id; if(id==="make"){syncFree()} else if(S.sel&&S.sel.free){S.sel=null} render(); break;
+  case "vtest": testVoice(id==="en"?"en":"ja"); break;
+  case "kana": insertText(b.dataset.c); S.row=null; render(); break;
+  case "krow": S.row=+b.dataset.i; render(); break;
+  case "kback": S.row=null; render(); break;
+  case "kdel": deleteBack(); render(); break;
+  case "kclr": S.buf="";S.caret=0;S.row=null;syncFree();render();break;
+  case "kdaku": case "ksmall": cycleLast(); render(); break;
+  case "kword": insertText(b.dataset.w); render(); break;
+  case "ktile": {const o=tiles()[+b.dataset.i]; if(o){insertText(o.hira); render()} break}
+  case "kpred": {const e=predictions()[+b.dataset.i]; if(e){S.buf=e.hira; S.caret=S.buf.length; syncFree(); render()} break}
   case "phback": S.step=S.step==="expr"?"intent":"scene";render();break;
   case "closep": S.panel=null;S.msg="";S.form=false;render();break;
   case "rolepick": S.panel="rolepick";render();break;
@@ -687,13 +872,19 @@ document.addEventListener("keydown",ev=>{
   if(ev.target.matches&&ev.target.matches("input,select,textarea")) return;
   if(ev.key==="Escape"){ if(S.panel==="attn")stopAttn(); else if(S.panel){S.panel=null;S.msg="";render()} else if(layoutOf()==="p1"&&S.step!=="scene"){S.step=S.step==="expr"?"intent":"scene";render()} return }
   if(S.panel) return;
-  if(ev.key===" "&&S.sel&&!isHeavy(S.sel)){ev.preventDefault();speak(S.sel);return}
+  if(S.mode==="make") return;
+  if(ev.key===" "&&S.sel&&!isHeavy(S.sel)&&!(ev.target.matches&&ev.target.matches("button,a,summary"))){ev.preventDefault();speak(S.sel);return}
   if(/^[1-9]$/.test(ev.key)&&(devType()==="desktop"||devType()==="laptop")){
     const list=currentCandidates(),i=S.page*perPage()+(+ev.key-1); if(list[i]) pick(list[i]);
   }
 });
 document.addEventListener("keyup",ev=>{const b=ev.target.closest&&ev.target.closest(".hold"); if(b&&(ev.key===" "||ev.key==="Enter")) holdCancel(b)});
 document.addEventListener("toggle",ev=>{const d=ev.target; if(d&&d.dataset&&d.dataset.d) S.open[d.dataset.d]=d.open},true);
+document.addEventListener("input",ev=>{
+  if(ev.target.id==="buf"){ S.buf=ev.target.value; S.caret=ev.target.selectionStart; updateLive() }
+});
+["keyup","click","select"].forEach(n=>document.addEventListener(n,ev=>{ if(ev.target.id==="buf") S.caret=ev.target.selectionStart }));
+document.addEventListener("change",ev=>{ if(ev.target.id==="c-scene"){ S.scene=ev.target.value; render() } });
 /* 設定フォーム */
 document.addEventListener("change",ev=>{
   const el=ev.target, id=el.id||"";
@@ -708,6 +899,11 @@ document.addEventListener("change",ev=>{
   else if(id==="s-per")P.perPage=el.value;
   else if(id==="s-rate")P.rate=+el.value;
   else if(id==="s-vol")P.volume=+el.value;
+  else if(id==="s-compose"){P.compose=el.value; if(el.value==="pick"&&S.mode==="make"){S.mode="pick";if(S.sel&&S.sel.free)S.sel=null}}
+  else if(id==="s-predict")P.predict=+el.value;
+  else if(id==="s-vja")P.voiceJa=el.value;
+  else if(id==="s-ven")P.voiceEn=el.value;
+  else if(id==="s-kana"){P.kana=el.value;S.row=null}
   else if(id==="s-icons")P.icons=el.checked;
   else if(id==="s-confirm")P.confirm=el.checked;
   else return;
