@@ -147,7 +147,7 @@ textarea#buf{resize:vertical}
 
 <script>
 "use strict";
-const VERSION="0.2.1", VARIANT="public";
+const VERSION="0.2.2", VARIANT="public";
 
 /* ---------- 文言（日本語／English） ---------- */
 const T={
@@ -185,6 +185,7 @@ ja:{
  compose:"つくる 入力",composeOpts:{pick:"えらぶ だけ",both:"えらぶ ＋ つくる"},predict:"よそうの 数",kana:"50音ばんの ひょうじ",
  kanaOpts:{auto:"自動（スマホは 2 だん）",full:"ぜんぶ 出す",step2:"行 → もじ の 2 だん"},
  composeNote:"つくった ことばは 記録しません。ことば帖に 入れたときだけ 保存します。",
+ voiceNow:"いま つかう 声",voiceLow:"この声は 聞きとりにくい ことが あります。ほかの声を えらぶか、端末の設定で 高品質な声（Samantha・Alex・Enhanced など）を 追加してください。",
  voiceJa:"日本語の 声",voiceEn:"英語の 声",voiceAuto:"自動（よい声を えらぶ）",voiceTest:"きいてみる",voiceNone:"この端末には 声が ありません",
 },
 en:{
@@ -221,6 +222,7 @@ en:{
  compose:"Compose input",composeOpts:{pick:"Choose only",both:"Choose + Compose"},predict:"Suggestions",kana:"Kana board",
  kanaOpts:{auto:"Auto",full:"Full",step2:"2 steps"},
  composeNote:"Composed text is not recorded. It is saved only when you add it to a phrasebook.",
+ voiceNow:"Current voice",voiceLow:"This voice may sound rough. Pick another voice, or add a high-quality voice (Samantha, Alex, Enhanced…) in your device settings.",
  voiceJa:"Japanese voice",voiceEn:"English voice",voiceAuto:"Auto (pick a good voice)",voiceTest:"Listen",voiceNone:"No voices on this device",
 }};
 
@@ -328,11 +330,12 @@ if("speechSynthesis" in window){refreshVoices();speechSynthesis.addEventListener
 const ttsOK=()=>"speechSynthesis" in window&&"SpeechSynthesisUtterance" in window;
 function voiceScore(v){
   const n=(v.name||"").toLowerCase(); let sc=0;
-  if(/natural|neural|online/.test(n)) sc+=6;
-  if(/enhanced|premium|siri/.test(n)) sc+=5;
-  if(/google/.test(n)) sc+=3;
-  if(/samantha|aria|jenny|guy|ava|allison|karen|daniel|kyoko|otoya|nanami|keita|haruka/.test(n)) sc+=2;
-  if(/compact|espeak|novelty|whisper|bad|bells|boing|cellos|zarvox|trinoids|organ|jester|hysterical/.test(n)) sc-=8;
+  if(/natural|neural|online|multilingual/.test(n)) sc+=8;
+  if(/enhanced|premium|siri|\(premium\)|\(enhanced\)/.test(n)) sc+=7;
+  if(/^google/.test(n)) sc+=5;
+  if(/^(samantha|alex|daniel|karen|moira|tessa|serena|ava|allison|susan|zira|aria|jenny|guy|kyoko|otoya|nanami|keita|haruka)\b/.test(n)) sc+=5;
+  /* ロボット声・かすれ声・効果音声は避ける */
+  if(/whisper|fred|ralph|kathy|junior|albert|bruce|vicki|victoria|princess|agnes|eddy|flo\b|grandma|grandpa|rocko|sandy|shelley|reed|bad news|good news|bahh|bells|boing|bubbles|cellos|wobble|jester|organ|superstar|trinoids|zarvox|hysterical|deranged|compact|espeak|novelty/.test(n)) sc-=12;
   if(v.localService===false) sc+=1;
   return sc;
 }
@@ -713,6 +716,11 @@ function panelHTML(){
   }
   return "";
 }
+function voiceNote(lang){
+  const v=pickVoice(lang); if(!v) return "";
+  const low=voiceScore(v)<3;
+  return `<p class="note">${esc(t("voiceNow"))}: <strong>${esc(v.name)}</strong>${low?`<br>${esc(t("voiceLow"))}`:""}</p>`;
+}
 function voiceOpts(lang,cur){
   const list=voicesFor(lang); if(!list.length) return `<option value="">${t("voiceNone")}</option>`;
   return opt("",cur||"",t("voiceAuto"))+list.map(v=>opt(v.voiceURI||v.name,cur,v.name+" ("+v.lang+")")).join("");
@@ -736,8 +744,8 @@ function settingsHTML(){
    <div><label class="f" for="s-compose">${t("compose")}</label><select id="s-compose">${["pick","both"].map(k=>opt(k,P.compose,t("composeOpts")[k])).join("")}</select></div>
    <div><label class="f" for="s-predict">${t("predict")}</label><select id="s-predict">${[0,3,5,8].map(k=>opt(k,P.predict,k)).join("")}</select></div>
    <div><label class="f" for="s-kana">${t("kana")}</label><select id="s-kana">${["auto","full","step2"].map(k=>opt(k,P.kana,t("kanaOpts")[k])).join("")}</select></div>
-   <div><label class="f" for="s-vja">${t("voiceJa")}</label><select id="s-vja">${voiceOpts("ja-JP",P.voiceJa)}</select><button class="btn small" data-act="vtest" data-id="ja" style="margin-top:.3rem">🔊 ${t("voiceTest")}</button></div>
-   <div><label class="f" for="s-ven">${t("voiceEn")}</label><select id="s-ven">${voiceOpts("en-US",P.voiceEn)}</select><button class="btn small" data-act="vtest" data-id="en" style="margin-top:.3rem">🔊 ${t("voiceTest")}</button></div>
+   <div><label class="f" for="s-vja">${t("voiceJa")}</label>${voiceNote("ja-JP")}<select id="s-vja">${voiceOpts("ja-JP",P.voiceJa)}</select><button class="btn small" data-act="vtest" data-id="ja" style="margin-top:.3rem">🔊 ${t("voiceTest")}</button></div>
+   <div><label class="f" for="s-ven">${t("voiceEn")}</label>${voiceNote("en-US")}<select id="s-ven">${voiceOpts("en-US",P.voiceEn)}</select><button class="btn small" data-act="vtest" data-id="en" style="margin-top:.3rem">🔊 ${t("voiceTest")}</button></div>
    <div><label class="f" for="s-vol">${t("volume")}</label><select id="s-vol">${t("vols").map((v,i)=>opt(i,P.volume,v)).join("")}</select></div>
   </div>
   ${chk("s-icons",P.icons,t("icons"))}${chk("s-confirm",P.confirm,t("confirm"))}
