@@ -112,7 +112,10 @@ summary{cursor:pointer;font-weight:700;min-height:40px;display:flex;align-items:
 .tabs{display:flex;gap:.3rem;flex-wrap:wrap;margin-bottom:.5rem}
 .modes{display:flex;gap:.4rem;padding:.3rem .5rem 0}
 .board{display:grid;gap:.35rem;margin:.4rem 0}
+.board.rtl{direction:rtl}
+.board.rtl>*{direction:ltr}
 .board.c10{grid-template-columns:repeat(10,minmax(0,1fr))}
+.board.c7{grid-template-columns:repeat(7,minmax(0,1fr))}
 .board.c5{grid-template-columns:repeat(5,minmax(0,1fr))}
 .board.fnrow{grid-template-columns:repeat(auto-fit,minmax(3rem,1fr))}
 .key{border:2px solid var(--line);background:var(--tile);border-radius:.6rem;min-height:calc(var(--tile-min) - 4px);font-size:1.3rem;font-weight:700}
@@ -148,13 +151,13 @@ textarea#buf{resize:vertical}
 
 <script>
 "use strict";
-const VERSION="0.2.4", VARIANT="public";
+const VERSION="0.2.7", VARIANT="public";
 
 /* ---------- 文言（日本語／English） ---------- */
 const T={
 ja:{
- app:"ことむすび",tag:"Words that connect.",role:"たちば",scene:"ばめん",intent:"なにを したい？",level:"つよさ",
- lv:["ぜんぶ","ひかえめ","ふつう","つよい"],speak:"はなす",stop:"とめる",show:"みせる",send:"おくる",
+ app:"ことむすび",tag:"Words that connect.",role:"たちば",scene:"ばめん",intent:"なにを したい？",level:"どのくらい つよく いう？",levelHelp:"ひょうげんの 右上の ● が おおいほど、はっきりした いいかたです。",
+ lv:["ぜんぶ","ひかえめ","ふつう","はっきり"],speak:"はなす",stop:"とめる",show:"みせる",send:"おくる",
  addTo:"ことば帖に入れる",clear:"けす",attn:"よびかけ",help:"たすけを よぶ",fav:"ことば帖",set:"せってい",
  back:"もどる",next:"つぎ",prev:"まえ",close:"とじる",empty:"ひょうげんを えらんでください",
  hold:"ながおし",holdTip:"ボタンを おしたまま まってください",
@@ -190,8 +193,8 @@ ja:{
  voiceJa:"日本語の 声",voiceEn:"英語の 声",voiceAuto:"自動（よい声を えらぶ）",voiceTest:"きいてみる",voiceNone:"この端末には 声が ありません",
 },
 en:{
- app:"KOTOMUSUBI",tag:"Words that connect.",role:"Who",scene:"Where",intent:"What for",level:"Strength",
- lv:["All","Gentle","Normal","Strong"],speak:"Speak",stop:"Stop",show:"Show",send:"Send",
+ app:"KOTOMUSUBI",tag:"Words that connect.",role:"Who",scene:"Where",intent:"What for",level:"How strongly do you say it?",levelHelp:"More dots on a tile means a more direct way of saying it.",
+ lv:["All","Gentle","Normal","Firm"],speak:"Speak",stop:"Stop",show:"Show",send:"Send",
  addTo:"Add to phrasebook",clear:"Clear",attn:"Get attention",help:"Call for help",fav:"Phrasebook",set:"Settings",
  back:"Back",next:"Next",prev:"Prev",close:"Close",empty:"Choose an expression",
  hold:"Hold",holdTip:"Press and hold the button",
@@ -308,7 +311,7 @@ const label=o=>disp({hira:o.hira,ruby:o.ruby,en:o.en});
 const isHeavy=e=>e&&((e.intent==="trouble"&&e.level===3)||(e.role==="counsel"&&(e.level===3||e.intent==="trouble"||e.intent==="feeling")));
 
 /* ---------- 状態 ---------- */
-const S={mode:"pick",buf:"",caret:0,row:null,bufTA:false,open:{},scene:null,intent:"request",level:0,page:0,step:"scene",sel:null,panel:null,book:null,edit:false,form:false,speaking:false,loading:true,err:false,msg:""};
+const S={shift:false,mode:"pick",buf:"",caret:0,row:null,bufTA:false,open:{},scene:null,intent:"request",level:0,page:0,step:"scene",sel:null,panel:null,book:null,edit:false,form:false,speaking:false,loading:true,err:false,msg:""};
 let attnTimer=null,audioCtx=null,holdTimer=null;
 
 /* ---------- 帖 ---------- */
@@ -497,7 +500,8 @@ function cycleChar(c){
   for(const [a,b] of SMALL){ if(c===a) return b; if(c===b) return a }
   return null;
 }
-const useBoard=()=>P.lang==="ja";
+const useBoard=()=>true; const isEn=()=>P.lang==="en";
+const LETTERS="abcdefghijklmnopqrstuvwxyz".split("");
 function kanaMode(){ if(P.kana==="full") return "full"; if(P.kana==="step2") return "step2"; return devType()==="phone"?"step2":"full"; }
 function syncFree(){
   const tx=S.buf.trim();
@@ -520,13 +524,18 @@ function cycleLast(){
 function sceneExprs(){return (CACHE[P.role]||[]).filter(e=>e.scene===S.scene)}
 function predictions(){
   const n=+P.predict; if(!n||!S.buf.trim()) return [];
-  const key=S.buf.replace(/\s/g,""); if(!key) return [];
+  const en=isEn();
+  const key=en?S.buf.trim().toLowerCase().replace(/\s+/g," "):S.buf.replace(/\s/g,""); if(!key) return [];
   const seen=new Set(), out=[];
   const pool=[];
   BOOKS.forEach(b=>b.items.forEach(i=>pool.push(i)));
   Object.values(USAGE).forEach(u=>pool.push(u));
   sceneExprs().forEach(e=>pool.push(e));
   for(const e of pool){
+    if(en){
+      const x=(e.en||"").toLowerCase(); if(!x||x===key||!x.startsWith(key)) continue;
+      if(seen.has(x)) continue; seen.add(x); out.push(e); if(out.length>=n) break; continue;
+    }
     const h=e.hira.replace(/\s/g,""), k=stripRuby(e.ruby).replace(/\s/g,"");
     if(h===key||k===key) continue;
     if(!(h.startsWith(key)||k.startsWith(key))) continue;
@@ -537,6 +546,10 @@ function predictions(){
 }
 function tiles(){
   const cnt=new Map();
+  if(isEn()){
+    sceneExprs().forEach(e=>{ (e.en||"").replace(/[.,?!]/g,"").split(/\s+/).forEach(w=>{ if(w.length<3) return; const k=w.toLowerCase(); const o=cnt.get(k)||{hira:k,ruby:k,en:k,n:0}; o.n++; cnt.set(k,o)}) });
+    return [...cnt.values()].sort((a,b)=>b.n-a.n||a.hira.length-b.hira.length).slice(0,14);
+  }
   sceneExprs().forEach(e=>{
     const h=e.hira.split(" "), r=e.ruby.split(" ");
     h.forEach((w,i)=>{ if(w.length<2) return; const o=cnt.get(w)||{hira:w,ruby:r[i]||w,n:0}; o.n++; cnt.set(w,o)});
@@ -547,20 +560,32 @@ function predHTML(){
   const ps=predictions(); if(!ps.length) return "";
   return `<h2>${t("predTitle")}</h2><div class="chips">${ps.map((e,i)=>`<button class="chip" data-act="kpred" data-i="${i}" data-key="kp${i}">${disp(e)}</button>`).join("")}</div>`;
 }
+function boardHTMLen(){
+  const act=(label,a,extra="")=>`<button class="key fn" data-act="${a}" data-key="k-${a}" ${extra}>${label}</button>`;
+  const cap=S.shift?"⇧":"⇧";
+  const keys=LETTERS.map(c=>`<button class="key" data-act="klet" data-c="${c}" data-key="k-${c}">${atStart()||S.shift?c.toUpperCase():c}</button>`).join("");
+  const fn=`<div class="board fnrow">${act("⌫","kdel",`aria-label="${t("kdel")}"`)}${act(cap,"kshift",`aria-pressed="${S.shift}" aria-label="Shift"`)}${[".",",","?","!","'","-"].map(c=>act(c,"kword",`data-w="${c}"`)).join("")}${act("␣","kword",'data-w=" " aria-label="Space"')}</div>`;
+  return `<div class="board c7">${keys}</div>${fn}`;
+}
+function atStart(){
+  const before=S.buf.slice(0,Math.min(S.caret,S.buf.length)).trimEnd();
+  return before===""||/[.?!]$/.test(before);
+}
 function boardHTML(){
+  if(isEn()) return boardHTMLen();
   const mode=kanaMode();
   const act=(label,a,extra="")=>`<button class="key fn" data-act="${a}" data-key="k-${a}" ${extra}>${label}</button>`;
   const fnrow=`<div class="board fnrow">${act("⌫","kdel",`aria-label="${t("kdel")}"`)}${act("゛ ゜","kdaku",'aria-label="だくてん・はんだくてん"')}${act("小","ksmall",'aria-label="ちいさい もじ"')}${act("ー","kword","data-w=\"ー\"")}${act("、","kword","data-w=\"、\"")}${act("。","kword","data-w=\"。\"")}${act("？","kword","data-w=\"？\"")}${act("！","kword","data-w=\"！\"")}${act("␣","kword","data-w=\" \" aria-label=\""+t("kspace")+"\"")}</div>`;
   let body="";
   if(mode==="step2"){
     if(S.row===null){
-      body=`<div class="board c5">${ROWS.map((r,i)=>`<button class="key" data-act="krow" data-i="${i}" data-key="kr${i}">${r[0]}</button>`).join("")}</div>`;
+      body=`<div class="board c5 rtl">${ROWS.map((r,i)=>`<button class="key" data-act="krow" data-i="${i}" data-key="kr${i}">${r[0]}</button>`).join("")}</div>`;
     }else{
-      body=`<div class="board c5">${ROWS[S.row].map(c=>c?`<button class="key" data-act="kana" data-c="${c}" data-key="k-${c}">${c}</button>`:`<span></span>`).join("")}</div><div class="row"><button class="btn small" data-act="kback" data-key="k-back">◀ ${t("kback")}</button></div>`;
+      body=`<div class="board c5 rtl">${ROWS[S.row].map(c=>c?`<button class="key" data-act="kana" data-c="${c}" data-key="k-${c}">${c}</button>`:`<span></span>`).join("")}</div><div class="row"><button class="btn small" data-act="kback" data-key="k-back">◀ ${t("kback")}</button></div>`;
     }
   }else{
     const cells=[]; for(let v=0;v<5;v++) for(let r=0;r<10;r++) cells.push(ROWS[r][v]);
-    body=`<div class="board c10">${cells.map(c=>c?`<button class="key" data-act="kana" data-c="${c}" data-key="k-${c}">${c}</button>`:`<span></span>`).join("")}</div>`;
+    body=`<div class="board c10 rtl">${cells.map(c=>c?`<button class="key" data-act="kana" data-c="${c}" data-key="k-${c}">${c}</button>`:`<span></span>`).join("")}</div>`;
   }
   return body+fnrow;
 }
@@ -572,7 +597,7 @@ function composeHTML(){
    <textarea id="buf" rows="2" aria-label="${t("bufLabel")}" placeholder="${t("bufPh")}" inputmode="${useBoard()&&kanaMode()!=="ime"?"none":"text"}" style="font-size:1.3rem">${esc(S.buf)}</textarea>
    ${actions}
    <div id="predbox">${predHTML()}</div>
-   ${useBoard()?`<h2>50</h2>${boardHTML()}`:""}
+   ${useBoard()?`<h2>${isEn()?"ABC":"50"}</h2>${boardHTML()}`:""}
    ${tl.length?`<h2>${t("tilesTitle")}</h2><div class="chips">${tl.map((o,i)=>`<button class="chip" data-act="ktile" data-i="${i}" data-key="kt${i}">${disp({hira:o.hira,ruby:o.ruby,en:""})}</button>`).join("")}</div>`:""}
    <label class="f" for="c-scene">${t("sceneFor")}</label><select id="c-scene">${scenes.map(sc=>`<option value="${sc.id}" ${S.scene===sc.id?"selected":""}>${esc(plain({hira:sc.hira,ruby:sc.ruby,en:sc.en}))}</option>`).join("")}</select>
    <p class="note">${t("composeNote")}</p>`;
@@ -614,6 +639,7 @@ function candHTML(){
   const lvl=`<div class="chips" role="group" aria-label="${t("level")}">${t("lv").map((n,i)=>`<button class="chip" data-act="level" data-id="${i}" data-key="l${i}" aria-pressed="${S.level===i}">${esc(n)}</button>`).join("")}</div>`;
   const selId=S.sel&&S.sel.id;
   return `<h2>${t("level")}</h2>${lvl}
+  <p class="note" style="margin:.3rem 0 0">${t("levelHelp")} ● ${esc(t("lv")[1])} ／ ●● ${esc(t("lv")[2])} ／ ●●● ${esc(t("lv")[3])}</p>
   <div class="grid" style="margin-top:.5rem">${cur.map((e,k)=>tileHTML(e,start+k,selId===e.id)).join("")}</div>
   <div class="pager"><button class="btn small" data-act="prev" ${S.page<=0?"disabled":""}>◀ ${t("prev")}</button>
   <span class="pg">${S.page+1} / ${pages}（${list.length}）</span>
@@ -835,8 +861,10 @@ document.addEventListener("click",ev=>{
   case "kclr": S.buf="";S.caret=0;S.row=null;syncFree();render();break;
   case "kdaku": case "ksmall": cycleLast(); render(); break;
   case "kword": insertText(b.dataset.w); render(); break;
-  case "ktile": {const o=tiles()[+b.dataset.i]; if(o){insertText(o.hira); render()} break}
-  case "kpred": {const e=predictions()[+b.dataset.i]; if(e){S.buf=e.hira; S.caret=S.buf.length; syncFree(); render()} break}
+  case "ktile": {const o=tiles()[+b.dataset.i]; if(o){ if(isEn()){const up=atStart(); insertText((up?o.hira[0].toUpperCase()+o.hira.slice(1):o.hira)+" ")} else insertText(o.hira); render()} break}
+  case "klet": {const c=b.dataset.c; insertText(atStart()||S.shift?c.toUpperCase():c); S.shift=false; render(); break}
+  case "kshift": S.shift=!S.shift; render(); break;
+  case "kpred": {const e=predictions()[+b.dataset.i]; if(e){S.buf=isEn()?e.en:e.hira; S.caret=S.buf.length; syncFree(); render()} break}
   case "phback": S.step=S.step==="expr"?"intent":"scene";render();break;
   case "closep": S.panel=null;S.msg="";S.form=false;render();break;
   case "rolepick": S.panel="rolepick";render();break;
