@@ -42,6 +42,7 @@ ruby rt{font-size:.5em}
 #app{display:flex;flex-direction:column;height:100dvh}
 header.top{display:flex;gap:.4rem;align-items:center;padding:.4rem .6rem;background:var(--hdr-bg);color:var(--hdr-ink);flex-wrap:wrap}
 header.top h1{font-size:1.05rem;margin:0 .4rem 0 0;white-space:nowrap}
+.ver{font-size:.6rem;font-weight:700;margin-left:.4em;padding:.05rem .4rem;border:1px solid currentColor;border-radius:.6rem;vertical-align:middle;white-space:nowrap}
 header.top h1 small{font-weight:normal;font-size:.6em;opacity:.85;margin-left:.3em}
 .sp{flex:1}
 .hbtn{border:2px solid var(--hdr-ink);background:transparent;color:var(--hdr-ink);border-radius:.6rem;padding:.3rem .7rem;min-height:44px;font-weight:600}
@@ -147,7 +148,7 @@ textarea#buf{resize:vertical}
 
 <script>
 "use strict";
-const VERSION="0.2.3", VARIANT="public";
+const VERSION="0.2.4", VARIANT="public";
 
 /* ---------- 文言（日本語／English） ---------- */
 const T={
@@ -642,7 +643,7 @@ function sentenceInner(){
 function headerHTML(){
   const r=INDEX&&roleObj(P.role);
   return `<header class="top">
-   <h1>${t("app")}<small>${t("tag")}</small></h1>
+   <h1>${t("app")}<small>${t("tag")}</small><span class="ver" aria-label="version">v${VERSION}${VARIANT==="private"?" private":""}</span></h1>
    <button class="hbtn" data-act="rolepick" data-key="h-role" aria-haspopup="dialog">${r?label(r):""} ▾</button>
    <span class="sp"></span>
    <button class="hbtn attn" data-act="attn" data-key="h-attn">📣 ${t("attn")}</button>
