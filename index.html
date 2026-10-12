@@ -155,7 +155,7 @@ textarea#buf{resize:vertical}
 
 <script>
 "use strict";
-const VERSION="0.2.8", VARIANT="public";
+const VERSION="0.2.9", VARIANT="public";
 
 /* ---------- 文言（日本語／English） ---------- */
 const T={
@@ -193,7 +193,7 @@ ja:{
  compose:"つくる 入力",composeOpts:{pick:"えらぶ だけ",both:"えらぶ ＋ つくる"},predict:"よそうの 数",kana:"50音ばんの ひょうじ",
  kanaOpts:{auto:"自動（スマホは 2 だん）",full:"ぜんぶ 出す",step2:"行 → もじ の 2 だん"},
  composeNote:"つくった ことばは 記録しません。ことば帖に 入れたときだけ 保存します。",
- kindLabel:"もじの しゅるい",kindHira:"あ ひらがな",kindKata:"ア カタカナ",kindAbc:"A アルファベット",layoutLabel:"ならびかた",layoutAbc:"アルファベット順",layoutQw:"タイピング順（QWERTY）",
+ kindLabel:"もじの しゅるい",kindHira:"あ 五十音（ひらがな）",kindKata:"ア 五十音（カタカナ）",kindAbc:"A アルファベット（Alphabet）",layoutLabel:"ならびかた",layoutAbc:"ABC順（Alphabet）",layoutQw:"QWERTY（タイピング順）",
  voiceNow:"いま つかう 声",voiceLow:"この声は 聞きとりにくい ことが あります。ほかの声を えらぶか、端末の設定で 高品質な声（Samantha・Alex・Enhanced など）を 追加してください。",
  voiceJa:"日本語の 声",voiceEn:"英語の 声",voiceAuto:"自動（よい声を えらぶ）",voiceTest:"きいてみる",voiceNone:"この端末には 声が ありません",
 },
@@ -231,7 +231,7 @@ en:{
  compose:"Compose input",composeOpts:{pick:"Choose only",both:"Choose + Compose"},predict:"Suggestions",kana:"Kana board",
  kanaOpts:{auto:"Auto",full:"Full",step2:"2 steps"},
  composeNote:"Composed text is not recorded. It is saved only when you add it to a phrasebook.",
- kindLabel:"Input",kindHira:"Hiragana",kindKata:"Katakana",kindAbc:"Alphabet",layoutLabel:"Layout",layoutAbc:"A–Z order",layoutQw:"QWERTY (typing order)",
+ kindLabel:"Input",kindHira:"Hiragana",kindKata:"Katakana",kindAbc:"Alphabet",layoutLabel:"Layout",layoutAbc:"the Alphabet (A–Z)",layoutQw:"QWERTY (typing order)",
  voiceNow:"Current voice",voiceLow:"This voice may sound rough. Pick another voice, or add a high-quality voice (Samantha, Alex, Enhanced…) in your device settings.",
  voiceJa:"Japanese voice",voiceEn:"English voice",voiceAuto:"Auto (pick a good voice)",voiceTest:"Listen",voiceNone:"No voices on this device",
 }};
