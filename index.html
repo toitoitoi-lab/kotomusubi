@@ -115,6 +115,10 @@ summary{cursor:pointer;font-weight:700;min-height:40px;display:flex;align-items:
 .board.rtl{direction:rtl}
 .board.rtl>*{direction:ltr}
 .board.c10{grid-template-columns:repeat(10,minmax(0,1fr))}
+.chip.sm{min-height:36px;padding:.15rem .6rem;font-size:.85rem}
+.abcb .key{min-height:46px;font-size:1.15rem}
+.qrow{display:flex;gap:.35rem;justify-content:center;margin:.35rem 0}
+.qrow .key{flex:0 1 calc((100% - 9*.35rem)/10);min-width:0}
 .board.c7{grid-template-columns:repeat(7,minmax(0,1fr))}
 .board.c5{grid-template-columns:repeat(5,minmax(0,1fr))}
 .board.fnrow{grid-template-columns:repeat(auto-fit,minmax(3rem,1fr))}
@@ -151,7 +155,7 @@ textarea#buf{resize:vertical}
 
 <script>
 "use strict";
-const VERSION="0.2.7", VARIANT="public";
+const VERSION="0.2.8", VARIANT="public";
 
 /* ---------- 文言（日本語／English） ---------- */
 const T={
@@ -189,6 +193,7 @@ ja:{
  compose:"つくる 入力",composeOpts:{pick:"えらぶ だけ",both:"えらぶ ＋ つくる"},predict:"よそうの 数",kana:"50音ばんの ひょうじ",
  kanaOpts:{auto:"自動（スマホは 2 だん）",full:"ぜんぶ 出す",step2:"行 → もじ の 2 だん"},
  composeNote:"つくった ことばは 記録しません。ことば帖に 入れたときだけ 保存します。",
+ kindLabel:"もじの しゅるい",kindHira:"あ ひらがな",kindKata:"ア カタカナ",kindAbc:"A アルファベット",layoutLabel:"ならびかた",layoutAbc:"アルファベット順",layoutQw:"タイピング順（QWERTY）",
  voiceNow:"いま つかう 声",voiceLow:"この声は 聞きとりにくい ことが あります。ほかの声を えらぶか、端末の設定で 高品質な声（Samantha・Alex・Enhanced など）を 追加してください。",
  voiceJa:"日本語の 声",voiceEn:"英語の 声",voiceAuto:"自動（よい声を えらぶ）",voiceTest:"きいてみる",voiceNone:"この端末には 声が ありません",
 },
@@ -226,6 +231,7 @@ en:{
  compose:"Compose input",composeOpts:{pick:"Choose only",both:"Choose + Compose"},predict:"Suggestions",kana:"Kana board",
  kanaOpts:{auto:"Auto",full:"Full",step2:"2 steps"},
  composeNote:"Composed text is not recorded. It is saved only when you add it to a phrasebook.",
+ kindLabel:"Input",kindHira:"Hiragana",kindKata:"Katakana",kindAbc:"Alphabet",layoutLabel:"Layout",layoutAbc:"A–Z order",layoutQw:"QWERTY (typing order)",
  voiceNow:"Current voice",voiceLow:"This voice may sound rough. Pick another voice, or add a high-quality voice (Samantha, Alex, Enhanced…) in your device settings.",
  voiceJa:"Japanese voice",voiceEn:"English voice",voiceAuto:"Auto (pick a good voice)",voiceTest:"Listen",voiceNone:"No voices on this device",
 }};
@@ -236,7 +242,7 @@ const store={
  get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return k in mem?mem[k]:d}},
  set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){mem[k]=v}}
 };
-const DEF_PROFILE={lang:"ja",script:"hira",size:"L",theme:"normal",icons:true,confirm:true,rate:0.9,perPage:"auto",volume:1,role:"highschool",compose:"both",predict:5,kana:"auto",voiceJa:"",voiceEn:""};
+const DEF_PROFILE={lang:"ja",script:"hira",size:"L",theme:"normal",icons:true,confirm:true,rate:0.9,perPage:"auto",volume:1,role:"highschool",compose:"both",predict:5,kana:"auto",voiceJa:"",voiceEn:"",inputKind:"hira",abcLayout:"abc"};
 let P=Object.assign({},DEF_PROFILE,store.get("km.profile",{}));
 let DEV=store.get("km.device",{type:null,auto:true});
 let BOOKS=store.get("km.books",null);
@@ -269,7 +275,7 @@ function plain(o){
   if(P.script==="hira") return o.hira;
   return stripRuby(o.ruby);
 }
-function speakText(o){return P.lang==="en"?(o.en||""):o.hira}
+function speakText(o){return P.lang==="en"?(o.en||""):(o.ascii?o.en:o.hira)}
 const say=m=>{const l=document.getElementById("live");if(l){l.textContent="";setTimeout(()=>l.textContent=m,30)}};
 
 /* ---------- 端末プロファイル ---------- */
@@ -360,7 +366,7 @@ function speak(e){
   try{
     speechSynthesis.cancel();
     const u=new SpeechSynthesisUtterance(speakText(e));
-    const lang=P.lang==="en"?"en-US":"ja-JP"; u.lang=lang; u.rate=P.lang==="en"?Math.max(+P.rate,0.95):+P.rate;
+    const isE=P.lang==="en"||e.ascii; const lang=isE?"en-US":"ja-JP"; u.lang=lang; u.rate=isE?Math.max(+P.rate,0.95):+P.rate;
     const v=pickVoice(lang); if(v){u.voice=v; u.lang=v.lang}
     u.onstart=()=>{S.speaking=true;render()};
     u.onend=u.onerror=()=>{S.speaking=false;render()};
@@ -493,11 +499,20 @@ function printBook(){
 
 /* ---------- つくる（50音盤・予測・ことばタイル） ---------- */
 const ROWS=[["あ","い","う","え","お"],["か","き","く","け","こ"],["さ","し","す","せ","そ"],["た","ち","つ","て","と"],["な","に","ぬ","ね","の"],["は","ひ","ふ","へ","ほ"],["ま","み","む","め","も"],["や","","ゆ","","よ"],["ら","り","る","れ","ろ"],["わ","","を","","ん"]];
-const DAKU=["かがか","きぎき","くぐく","けげけ","こごこ","さざさ","しじし","すずす","せぜせ","そぞそ","ただた","ちぢち","つづっつ","てでて","とどと","はばぱは","ひびぴひ","ふぶぷふ","へべぺへ","ほぼぽほ","うゔう"].map(x=>[...x]);
+const DAKU=["かがか","きぎき","くぐく","けげけ","こごこ","さざさ","しじし","すずす","せぜせ","そぞそ","ただた","ちぢち","つづつ","てでて","とどと","はばぱは","ひびぴひ","ふぶぷふ","へべぺへ","ほぼぽほ","うゔう"].map(x=>[...x]);
 const SMALL=[["あ","ぁ"],["い","ぃ"],["う","ぅ"],["え","ぇ"],["お","ぉ"],["つ","っ"],["や","ゃ"],["ゆ","ゅ"],["よ","ょ"],["わ","ゎ"]];
-function cycleChar(c){
+const toHira=x=>String(x).replace(/[\u30a1-\u30f6]/g,c=>String.fromCharCode(c.charCodeAt(0)-0x60));
+const toKata=x=>String(x).replace(/[\u3041-\u3096]/g,c=>String.fromCharCode(c.charCodeAt(0)+0x60));
+const ROWS_KATA=ROWS.map(r=>r.map(toKata));
+const isAbc=()=>P.lang==="en"||P.inputKind==="abc";
+const rowsNow=()=>P.inputKind==="kata"?ROWS_KATA:ROWS;
+const isAsciiText=x=>/^[\x20-\x7e]+$/.test(x)&&/[a-z]/i.test(x);
+function cycleChar(c0){
+  const c=toHira(c0), kata=c!==c0;
+  const r=cycleChar0(c); return r&&kata?toKata(r):r;
+}
+function cycleChar0(c){
   for(const g of DAKU){const i=g.indexOf(c); if(i>=0&&i<g.length-1) return g[i+1]; if(i===g.length-1) return g[0]}
-  for(const [a,b] of SMALL){ if(c===a) return b; if(c===b) return a }
   return null;
 }
 const useBoard=()=>true; const isEn=()=>P.lang==="en";
@@ -505,7 +520,8 @@ const LETTERS="abcdefghijklmnopqrstuvwxyz".split("");
 function kanaMode(){ if(P.kana==="full") return "full"; if(P.kana==="step2") return "step2"; return devType()==="phone"?"step2":"full"; }
 function syncFree(){
   const tx=S.buf.trim();
-  S.sel=tx?{id:"free",free:true,hira:P.lang==="en"?tx:readingOf(tx),ruby:tx,en:P.lang==="en"?tx:"",icon:"✏️",intent:"",scene:"",role:null}:null;
+  const asc=isAsciiText(tx);
+  S.sel=tx?{id:"free",free:true,ascii:asc,hira:P.lang==="en"?tx:readingOf(tx),ruby:tx,en:(P.lang==="en"||asc)?tx:"",icon:"✏️",intent:"",scene:"",role:null}:null;
 }
 function insertText(x){
   const c=Math.min(S.caret,S.buf.length);
@@ -516,16 +532,21 @@ function deleteBack(){
   const a=[...S.buf.slice(0,c)]; a.pop(); const head=a.join("");
   S.buf=head+S.buf.slice(c); S.caret=head.length; syncFree();
 }
-function cycleLast(){
+function cycleLast(kind){
   const c=Math.min(S.caret,S.buf.length); if(c<=0) return;
-  const ch=S.buf[c-1], n=cycleChar(ch); if(!n) return;
+  const ch=S.buf[c-1], n=kind==="small"?smallChar(ch):cycleChar(ch); if(!n) return;
   S.buf=S.buf.slice(0,c-1)+n+S.buf.slice(c); syncFree();
+}
+function smallChar(c0){
+  const c=toHira(c0), kata=c!==c0;
+  for(const [a,b] of SMALL){ const r=c===a?b:(c===b?a:null); if(r) return kata?toKata(r):r }
+  return null;
 }
 function sceneExprs(){return (CACHE[P.role]||[]).filter(e=>e.scene===S.scene)}
 function predictions(){
   const n=+P.predict; if(!n||!S.buf.trim()) return [];
-  const en=isEn();
-  const key=en?S.buf.trim().toLowerCase().replace(/\s+/g," "):S.buf.replace(/\s/g,""); if(!key) return [];
+  const en=isEn()||isAsciiText(S.buf.trim());
+  const key=en?S.buf.trim().toLowerCase().replace(/\s+/g," "):toHira(S.buf.replace(/\s/g,"")); if(!key) return [];
   const seen=new Set(), out=[];
   const pool=[];
   BOOKS.forEach(b=>b.items.forEach(i=>pool.push(i)));
@@ -536,7 +557,7 @@ function predictions(){
       const x=(e.en||"").toLowerCase(); if(!x||x===key||!x.startsWith(key)) continue;
       if(seen.has(x)) continue; seen.add(x); out.push(e); if(out.length>=n) break; continue;
     }
-    const h=e.hira.replace(/\s/g,""), k=stripRuby(e.ruby).replace(/\s/g,"");
+    const h=e.hira.replace(/\s/g,""), k=toHira(stripRuby(e.ruby).replace(/\s/g,""));
     if(h===key||k===key) continue;
     if(!(h.startsWith(key)||k.startsWith(key))) continue;
     if(seen.has(e.hira)) continue; seen.add(e.hira); out.push(e);
@@ -546,7 +567,7 @@ function predictions(){
 }
 function tiles(){
   const cnt=new Map();
-  if(isEn()){
+  if(isAbc()){
     sceneExprs().forEach(e=>{ (e.en||"").replace(/[.,?!]/g,"").split(/\s+/).forEach(w=>{ if(w.length<3) return; const k=w.toLowerCase(); const o=cnt.get(k)||{hira:k,ruby:k,en:k,n:0}; o.n++; cnt.set(k,o)}) });
     return [...cnt.values()].sort((a,b)=>b.n-a.n||a.hira.length-b.hira.length).slice(0,14);
   }
@@ -560,34 +581,47 @@ function predHTML(){
   const ps=predictions(); if(!ps.length) return "";
   return `<h2>${t("predTitle")}</h2><div class="chips">${ps.map((e,i)=>`<button class="chip" data-act="kpred" data-i="${i}" data-key="kp${i}">${disp(e)}</button>`).join("")}</div>`;
 }
-function boardHTMLen(){
-  const act=(label,a,extra="")=>`<button class="key fn" data-act="${a}" data-key="k-${a}" ${extra}>${label}</button>`;
-  const cap=S.shift?"⇧":"⇧";
-  const keys=LETTERS.map(c=>`<button class="key" data-act="klet" data-c="${c}" data-key="k-${c}">${atStart()||S.shift?c.toUpperCase():c}</button>`).join("");
-  const fn=`<div class="board fnrow">${act("⌫","kdel",`aria-label="${t("kdel")}"`)}${act(cap,"kshift",`aria-pressed="${S.shift}" aria-label="Shift"`)}${[".",",","?","!","'","-"].map(c=>act(c,"kword",`data-w="${c}"`)).join("")}${act("␣","kword",'data-w=" " aria-label="Space"')}</div>`;
-  return `<div class="board c7">${keys}</div>${fn}`;
-}
 function atStart(){
   const before=S.buf.slice(0,Math.min(S.caret,S.buf.length)).trimEnd();
   return before===""||/[.?!]$/.test(before);
 }
+function boardHTMLabc(){
+  const act=(label,a,extra="")=>`<button class="key fn" data-act="${a}" data-key="k-${a}" ${extra}>${label}</button>`;
+  const up=atStart()||S.shift;
+  const K=c=>`<button class="key" data-act="klet" data-c="${c}" data-key="k-${c}">${up?c.toUpperCase():c}</button>`;
+  const digits=`<div class="board c10">${"1234567890".split("").map(K).join("")}</div>`;
+  let letters;
+  if(P.abcLayout==="qwerty"){
+    letters=["qwertyuiop","asdfghjkl","zxcvbnm"].map(r=>`<div class="qrow">${r.split("").map(K).join("")}</div>`).join("");
+  }else{
+    letters=`<div class="board c7">${LETTERS.map(K).join("")}</div>`;
+  }
+  const fn=`<div class="board fnrow">${act("⌫","kdel",`aria-label="${t("kdel")}"`)}${act("⇧","kshift",`aria-pressed="${S.shift}" aria-label="Shift"`)}${[".",",","?","!","'","-"].map(c=>act(c,"kword",`data-w="${c}"`)).join("")}${act("␣","kword",'data-w=" " aria-label="Space"')}</div>`;
+  return `<div class="abcb">${letters}${digits}${fn}</div>`;
+}
 function boardHTML(){
-  if(isEn()) return boardHTMLen();
+  if(isAbc()) return boardHTMLabc();
+  const R=rowsNow();
   const mode=kanaMode();
   const act=(label,a,extra="")=>`<button class="key fn" data-act="${a}" data-key="k-${a}" ${extra}>${label}</button>`;
   const fnrow=`<div class="board fnrow">${act("⌫","kdel",`aria-label="${t("kdel")}"`)}${act("゛ ゜","kdaku",'aria-label="だくてん・はんだくてん"')}${act("小","ksmall",'aria-label="ちいさい もじ"')}${act("ー","kword","data-w=\"ー\"")}${act("、","kword","data-w=\"、\"")}${act("。","kword","data-w=\"。\"")}${act("？","kword","data-w=\"？\"")}${act("！","kword","data-w=\"！\"")}${act("␣","kword","data-w=\" \" aria-label=\""+t("kspace")+"\"")}</div>`;
   let body="";
   if(mode==="step2"){
     if(S.row===null){
-      body=`<div class="board c5 rtl">${ROWS.map((r,i)=>`<button class="key" data-act="krow" data-i="${i}" data-key="kr${i}">${r[0]}</button>`).join("")}</div>`;
+      body=`<div class="board c5 rtl">${R.map((r,i)=>`<button class="key" data-act="krow" data-i="${i}" data-key="kr${i}">${r[0]}</button>`).join("")}</div>`;
     }else{
-      body=`<div class="board c5 rtl">${ROWS[S.row].map(c=>c?`<button class="key" data-act="kana" data-c="${c}" data-key="k-${c}">${c}</button>`:`<span></span>`).join("")}</div><div class="row"><button class="btn small" data-act="kback" data-key="k-back">◀ ${t("kback")}</button></div>`;
+      body=`<div class="board c5 rtl">${R[S.row].map(c=>c?`<button class="key" data-act="kana" data-c="${c}" data-key="k-${c}">${c}</button>`:`<span></span>`).join("")}</div><div class="row"><button class="btn small" data-act="kback" data-key="k-back">◀ ${t("kback")}</button></div>`;
     }
   }else{
-    const cells=[]; for(let v=0;v<5;v++) for(let r=0;r<10;r++) cells.push(ROWS[r][v]);
+    const cells=[]; for(let v=0;v<5;v++) for(let r=0;r<10;r++) cells.push(R[r][v]);
     body=`<div class="board c10 rtl">${cells.map(c=>c?`<button class="key" data-act="kana" data-c="${c}" data-key="k-${c}">${c}</button>`:`<span></span>`).join("")}</div>`;
   }
   return body+fnrow;
+}
+function kindTabs(){
+  const kinds=P.lang==="ja"?`<div class="chips" role="group" aria-label="${t("kindLabel")}">${[["hira","kindHira"],["kata","kindKata"],["abc","kindAbc"]].map(([k,l])=>`<button class="chip sm" data-act="kind" data-id="${k}" data-key="kd-${k}" aria-pressed="${P.inputKind===k}">${t(l)}</button>`).join("")}</div>`:"";
+  const lay=isAbc()?`<div class="chips" role="group" aria-label="${t("layoutLabel")}" style="margin-top:.3rem">${[["abc","layoutAbc"],["qwerty","layoutQw"]].map(([k,l])=>`<button class="chip sm" data-act="abcl" data-id="${k}" data-key="ly-${k}" aria-pressed="${P.abcLayout===k}">${t(l)}</button>`).join("")}</div>`:"";
+  return kinds+lay;
 }
 function composeHTML(){
   const scenes=scenesOf(P.role);
@@ -597,8 +631,8 @@ function composeHTML(){
    <textarea id="buf" rows="2" aria-label="${t("bufLabel")}" placeholder="${t("bufPh")}" inputmode="${useBoard()&&kanaMode()!=="ime"?"none":"text"}" style="font-size:1.3rem">${esc(S.buf)}</textarea>
    ${actions}
    <div id="predbox">${predHTML()}</div>
-   ${useBoard()?`<h2>${isEn()?"ABC":"50"}</h2>${boardHTML()}`:""}
-   ${tl.length?`<h2>${t("tilesTitle")}</h2><div class="chips">${tl.map((o,i)=>`<button class="chip" data-act="ktile" data-i="${i}" data-key="kt${i}">${disp({hira:o.hira,ruby:o.ruby,en:""})}</button>`).join("")}</div>`:""}
+   ${kindTabs()}${useBoard()?`<h2>${isAbc()?"ABC":(P.inputKind==="kata"?"カタカナ":"50")}</h2>${boardHTML()}`:""}
+   ${tl.length?`<h2>${t("tilesTitle")}</h2><div class="chips">${tl.map((o,i)=>`<button class="chip" data-act="ktile" data-i="${i}" data-key="kt${i}">${P.lang==="ja"&&P.inputKind==="kata"?esc(toKata(o.hira)):disp({hira:o.hira,ruby:o.ruby,en:o.en||""})}</button>`).join("")}</div>`:""}
    <label class="f" for="c-scene">${t("sceneFor")}</label><select id="c-scene">${scenes.map(sc=>`<option value="${sc.id}" ${S.scene===sc.id?"selected":""}>${esc(plain({hira:sc.hira,ruby:sc.ruby,en:sc.en}))}</option>`).join("")}</select>
    <p class="note">${t("composeNote")}</p>`;
 }
@@ -769,6 +803,8 @@ function settingsHTML(){
    <div><label class="f" for="s-per">${t("perPage")}</label><select id="s-per">${opt("auto",P.perPage,t("auto"))}${[4,6,8,12].map(k=>opt(k,P.perPage,k)).join("")}</select></div>
    <div><label class="f" for="s-rate">${t("rate")}（${P.rate}）</label><input type="range" id="s-rate" min="0.5" max="1.3" step="0.1" value="${P.rate}" style="width:100%"></div>
    <div><label class="f" for="s-compose">${t("compose")}</label><select id="s-compose">${["pick","both"].map(k=>opt(k,P.compose,t("composeOpts")[k])).join("")}</select></div>
+   <div><label class="f" for="s-kind">${t("kindLabel")}</label><select id="s-kind">${[["hira","kindHira"],["kata","kindKata"],["abc","kindAbc"]].map(([k,l])=>opt(k,P.inputKind,t(l))).join("")}</select></div>
+   <div><label class="f" for="s-abcl">${t("layoutLabel")}</label><select id="s-abcl">${[["abc","layoutAbc"],["qwerty","layoutQw"]].map(([k,l])=>opt(k,P.abcLayout,t(l))).join("")}</select></div>
    <div><label class="f" for="s-predict">${t("predict")}</label><select id="s-predict">${[0,3,5,8].map(k=>opt(k,P.predict,k)).join("")}</select></div>
    <div><label class="f" for="s-kana">${t("kana")}</label><select id="s-kana">${["auto","full","step2"].map(k=>opt(k,P.kana,t("kanaOpts")[k])).join("")}</select></div>
    <div><label class="f" for="s-vja">${t("voiceJa")}</label>${voiceNote("ja-JP")}<select id="s-vja">${voiceOpts("ja-JP",P.voiceJa)}</select><button class="btn small" data-act="vtest" data-id="ja" style="margin-top:.3rem">🔊 ${t("voiceTest")}</button></div>
@@ -859,12 +895,15 @@ document.addEventListener("click",ev=>{
   case "kback": S.row=null; render(); break;
   case "kdel": deleteBack(); render(); break;
   case "kclr": S.buf="";S.caret=0;S.row=null;syncFree();render();break;
-  case "kdaku": case "ksmall": cycleLast(); render(); break;
+  case "kdaku": cycleLast("daku"); render(); break;
+  case "ksmall": cycleLast("small"); render(); break;
   case "kword": insertText(b.dataset.w); render(); break;
-  case "ktile": {const o=tiles()[+b.dataset.i]; if(o){ if(isEn()){const up=atStart(); insertText((up?o.hira[0].toUpperCase()+o.hira.slice(1):o.hira)+" ")} else insertText(o.hira); render()} break}
+  case "ktile": {const o=tiles()[+b.dataset.i]; if(o){ if(isAbc()){const up=atStart(); insertText((up?o.hira[0].toUpperCase()+o.hira.slice(1):o.hira)+" ")} else insertText(P.inputKind==="kata"?toKata(o.hira):o.hira); render()} break}
+  case "kind": P.inputKind=id; saveProfile(); S.row=null; render(); break;
+  case "abcl": P.abcLayout=id; saveProfile(); render(); break;
   case "klet": {const c=b.dataset.c; insertText(atStart()||S.shift?c.toUpperCase():c); S.shift=false; render(); break}
   case "kshift": S.shift=!S.shift; render(); break;
-  case "kpred": {const e=predictions()[+b.dataset.i]; if(e){S.buf=isEn()?e.en:e.hira; S.caret=S.buf.length; syncFree(); render()} break}
+  case "kpred": {const e=predictions()[+b.dataset.i]; if(e){S.buf=(isEn()||isAsciiText(S.buf.trim()))?e.en:(P.inputKind==="kata"?toKata(e.hira):e.hira); S.caret=S.buf.length; syncFree(); render()} break}
   case "phback": S.step=S.step==="expr"?"intent":"scene";render();break;
   case "closep": S.panel=null;S.msg="";S.form=false;render();break;
   case "rolepick": S.panel="rolepick";render();break;
@@ -938,6 +977,8 @@ document.addEventListener("change",ev=>{
   else if(id==="s-vol")P.volume=+el.value;
   else if(id==="s-compose"){P.compose=el.value; if(el.value==="pick"&&S.mode==="make"){S.mode="pick";if(S.sel&&S.sel.free)S.sel=null}}
   else if(id==="s-predict")P.predict=+el.value;
+  else if(id==="s-kind"){P.inputKind=el.value;S.row=null}
+  else if(id==="s-abcl")P.abcLayout=el.value;
   else if(id==="s-vja")P.voiceJa=el.value;
   else if(id==="s-ven")P.voiceEn=el.value;
   else if(id==="s-kana"){P.kana=el.value;S.row=null}
