@@ -57,6 +57,8 @@ main.p1{grid-template-columns:1fr;padding:.4rem;padding-bottom:0}
 .pane{background:var(--panel);border:2px solid var(--line);border-radius:.8rem;padding:.6rem;overflow:auto;min-height:0}
 .pane h2{font-size:.8rem;margin:.2rem 0 .3rem;color:var(--sub);font-weight:700}
 .list{display:flex;flex-direction:column;gap:.35rem}
+.rg{font-size:.95rem;margin:.7rem 0 .25rem;color:var(--sub)}
+.hbtn.on{background:var(--hdr-ink);color:var(--hdr-bg)}
 .chips{display:flex;flex-wrap:wrap;gap:.35rem}
 .chip{border:2px solid var(--line);background:var(--tile);border-radius:.6rem;padding:.35rem .7rem;min-height:44px;text-align:left}
 .chip[aria-pressed="true"]{background:var(--sel-bg);color:var(--sel-ink);border-color:var(--sel-bd);font-weight:700}
@@ -66,6 +68,7 @@ main.p1{grid-template-columns:1fr;padding:.4rem;padding-bottom:0}
 .tile .ic{font-size:1.6em;flex:none;line-height:1}
 .tile .tx{flex:1;min-width:0}
 .tile .lv{position:absolute;right:.5rem;top:.2rem;font-size:.55rem;color:var(--sub);letter-spacing:.1em}
+.tile .dl{position:absolute;right:.45rem;bottom:.2rem;font-size:.6rem;line-height:1;padding:.1rem .3rem;border:1px solid var(--accent);color:var(--accent);border-radius:.4rem;background:var(--tile)}
 .tile .num{position:absolute;left:.4rem;top:.1rem;font-size:.55rem;color:var(--sub)}
 .tile[aria-pressed="true"]{background:var(--tile-sel);border-color:var(--accent);box-shadow:0 0 0 3px var(--accent)}
 .pager{display:flex;gap:.4rem;align-items:center;margin:.5rem 0 0}
@@ -156,7 +159,7 @@ textarea#buf{resize:vertical}
 
 <script>
 "use strict";
-const VERSION="0.3.2", VARIANT="public";
+const VERSION="0.3.4", VARIANT="public";
 
 /* ---------- 文言（日本語／English） ---------- */
 const T={
@@ -194,7 +197,7 @@ ja:{
  compose:"じぶんの ことば入力",composeOpts:{pick:"えらぶ だけ",both:"えらぶ ＋ 五十音・アルファベット"},predict:"よそうの 数",kana:"50音ばんの ひょうじ",
  kanaOpts:{auto:"自動（スマホは 2 だん）",full:"ぜんぶ 出す",step2:"行 → もじ の 2 だん"},
  composeNote:"つくった ことばは 記録しません。ことば帖に 入れたときだけ 保存します。",
- dialShort:"標準語",dialLabel:"標準語・お国言葉",dialStd:"標準語",dialDraft:"ためし",dialWanted:"じゅんびちゅう",dialNoteDraft:"この地域の お国言葉は「ためし」です。まだ 地元の かたの かくにんを うけていません。ことばが ある ひょうげんだけ おきかわります。こえは 標準語の イントネーションで よみます。",dialNoteWanted:"この地域の お国言葉は まだ ありません。ひょうげんは 標準語のままです。",dialReq:"ごようぼう・まちがいの おしらせは こちら",kindLabel:"もじの しゅるい",kindHira:"ひらがな",kindKata:"カタカナ",kindAbc:"A アルファベット（Alphabet）",layoutLabel:"ならびかた",layoutAbc:"ABC順（Alphabet）",layoutQw:"QWERTY（タイピング順）",
+ dialShort:"標準語",dialLabel:"標準語・お国言葉",dialStd:"標準語",dialDraft:"ためし",dialWanted:"じゅんびちゅう",dialNoteDraft:"この地域の お国言葉は「ためし」です。ことばの きまり（ごびなど）で じどうてきに おきかえています。ていねいな いいかたが、くだけた いいかたに なることも あります。まだ 地元の かたの かくにんを うけていないので、ふしぜんな ところが あるかもしれません。「弁」の しるしが ついた ひょうげんが おきかわった ものです。こえは 標準語の イントネーションで よみます。「大切な ひょうげん」は おきかえません。",dialNoteWanted:"この地域の お国言葉は まだ ありません。ひょうげんは 標準語のままです。",dialReq:"ごようぼう・まちがいの おしらせは こちら",kindLabel:"もじの しゅるい",kindHira:"ひらがな",kindKata:"カタカナ",kindAbc:"A アルファベット（Alphabet）",layoutLabel:"ならびかた",layoutAbc:"ABC順（Alphabet）",layoutQw:"QWERTY（タイピング順）",
  voiceNow:"いま つかう 声",voiceLow:"この声は 聞きとりにくい ことが あります。ほかの声を えらぶか、端末の設定で 高品質な声（Samantha・Alex・Enhanced など）を 追加してください。",
  voiceJa:"日本語の 声",voiceEn:"英語の 声",voiceAuto:"自動（よい声を えらぶ）",voiceTest:"きいてみる",voiceNone:"この端末には 声が ありません",
 },
@@ -232,7 +235,7 @@ en:{
  compose:"Own-words input",composeOpts:{pick:"Choose only",both:"Choose + Alphabet / QWERTY"},predict:"Suggestions",kana:"Kana board",
  kanaOpts:{auto:"Auto",full:"Full",step2:"2 steps"},
  composeNote:"Composed text is not recorded. It is saved only when you add it to a phrasebook.",
- dialShort:"Standard",dialLabel:"Standard / Regional speech",dialStd:"Standard Japanese",dialDraft:"trial",dialWanted:"coming soon",dialNoteDraft:"This regional speech is a trial version and has not yet been checked by local speakers. Only some expressions are replaced. The voice reads with standard intonation.",dialNoteWanted:"No expressions for this region yet. Standard Japanese is used.",dialReq:"Requests and corrections",kindLabel:"Input",kindHira:"Hiragana",kindKata:"Katakana",kindAbc:"Alphabet",layoutLabel:"Layout",layoutAbc:"the Alphabet (A–Z)",layoutQw:"QWERTY (typing order)",
+ dialShort:"Standard",dialLabel:"Standard / Regional speech",dialStd:"Standard Japanese",dialDraft:"trial",dialWanted:"coming soon",dialNoteDraft:"This regional speech is a trial version: expressions are converted automatically by rules (e.g. sentence endings) and polite phrasing may become casual. They have not yet been checked by local speakers, so some may sound unnatural. Converted expressions are marked 弁. The voice reads with standard intonation. Important expressions are not converted.",dialNoteWanted:"No expressions for this region yet. Standard Japanese is used.",dialReq:"Requests and corrections",kindLabel:"Input",kindHira:"Hiragana",kindKata:"Katakana",kindAbc:"Alphabet",layoutLabel:"Layout",layoutAbc:"the Alphabet (A–Z)",layoutQw:"QWERTY (typing order)",
  voiceNow:"Current voice",voiceLow:"This voice may sound rough. Pick another voice, or add a high-quality voice (Samantha, Alex, Enhanced…) in your device settings.",
  voiceJa:"Japanese voice",voiceEn:"English voice",voiceAuto:"Auto (pick a good voice)",voiceTest:"Listen",voiceNone:"No voices on this device",
 }};
@@ -312,13 +315,17 @@ async function loadRole(id){
   else{const r=await fetch(`data/dict_${id}.json`); if(!r.ok) throw new Error("dict"); j=await r.json()}
   RAW[id]=j.rows; CACHE[id]=hydrate(id);
 }
-const RAW={}; let DIALIDX=null; const DIAL={id:"std",map:null};
+const RAW={}; let DIALIDX=null; const DIAL={id:"std",map:null,rules:null};
 const REQUEST_URL="https://github.com/toitoitoi-lab/kotomusubi/issues/new";
 const normStd=h=>h.replace(/[\s、。，．！？!?]/g,"");
 function hydrate(id){
   return RAW[id].map(r=>{
     const o={id:r[0],scene:r[1],intent:r[2],level:r[3],hira:r[4],ruby:r[5],en:r[6],icon:r[7],role:id};
-    if(DIAL.map){const d=DIAL.map.get(normStd(r[4])); if(d){o.std=o.hira;o.hira=d;o.ruby=d;o.dial=true}}
+    if((DIAL.map||DIAL.rules)&&!isHeavy(o)){
+      let d=DIAL.map&&DIAL.map.get(normStd(r[4]));
+      if(!d&&DIAL.rules){let t=r[4]; for(const [re,rp] of DIAL.rules) t=t.replace(re,rp); if(t!==r[4]) d=t}
+      if(d){o.std=o.hira;o.hira=d;o.ruby=d;o.dial=true}
+    }
     return o;
   });
 }
@@ -331,12 +338,13 @@ async function loadDialIndex(){
   return DIALIDX;
 }
 async function setDialect(id){
-  DIAL.id=id; DIAL.map=null;
+  DIAL.id=id; DIAL.map=null; DIAL.rules=null;
   if(id!=="std"){
     try{
       let j; if(window.__KM&&window.__KM.dialects) j=window.__KM.dialects[id];
       else{const r=await fetch(`data/dialect_${id}.json`); j=r.ok?await r.json():{rows:[]}}
-      if(j&&j.rows.length) DIAL.map=new Map(j.rows.map(x=>[normStd(x[0]),x[1]]));
+      if(j&&j.rows&&j.rows.length) DIAL.map=new Map(j.rows.map(x=>[normStd(x[0]),x[1]]));
+      if(j&&j.rules&&j.rules.length){const rs=[]; j.rules.forEach(x=>{try{rs.push([new RegExp(x[0],"g"),x[1]])}catch(e){}}); if(rs.length) DIAL.rules=rs}
     }catch(e){}
   }
   Object.keys(RAW).forEach(k=>{CACHE[k]=hydrate(k)});
@@ -690,7 +698,7 @@ function tileHTML(e,i,pressed,extra=""){
   return `<button class="tile" data-act="pick" data-i="${i}" data-key="t${i}" aria-pressed="${pressed}" ${extra}>
     ${devType()==="desktop"||devType()==="laptop"?`<span class="num" aria-hidden="true">${i%perPage()+1<=9?i%perPage()+1:""}</span>`:""}
     ${P.icons?`<span class="ic" aria-hidden="true">${esc(e.icon)}</span>`:""}
-    <span class="tx">${disp(e)}</span>${lv?`<span class="lv" aria-hidden="true">${lv}</span>`:""}</button>`;
+    <span class="tx">${disp(e)}</span>${lv?`<span class="lv" aria-hidden="true">${lv}</span>`:""}${e.dial?`<span class="dl" aria-hidden="true">弁</span>`:""}</button>`;
 }
 function navHTML(which){
   const scenes=scenesOf(P.role);
@@ -741,7 +749,7 @@ function headerHTML(){
   return `<header class="top">
    <h1>${t("app")}<small>${t("tag")}</small><span class="ver" aria-label="version">v${VERSION}${VARIANT==="private"?" private":""}</span></h1>
    <button class="hbtn" data-act="rolepick" data-key="h-role" aria-haspopup="dialog">${r?label(r):""} ▾</button>
-   <button class="hbtn" data-act="dialpick" data-key="h-dial" aria-haspopup="dialog">🗣 ${dialName()} ▾</button>
+   <button class="hbtn ${P.dialect&&P.dialect!=="std"?"on":""}" data-act="dialpick" data-key="h-dial" aria-haspopup="dialog">🗣 ${dialName()} ▾</button>
    <span class="sp"></span>
    <button class="hbtn attn" data-act="attn" data-key="h-attn">📣 ${t("attn")}</button>
    <button class="hbtn help" data-act="help" data-key="h-help">🆘 ${t("help")}</button>
@@ -782,12 +790,26 @@ function sheet(title,inner,extraClose){
   return `<div class="overlay" data-act="ovl"><div class="sheet" role="dialog" aria-modal="true" aria-label="${esc(title)}">
    <div class="hd"><h2>${esc(title)}</h2><button class="btn small" data-act="closep" data-key="p-close">${t("close")}</button></div>${inner}</div></div>`;
 }
+const ROLE_GROUPS=[
+  {ja:"学校[がっこう]",en:"School",ids:["elementary","juniorhigh","highschool","college"]},
+  {ja:"働[はたら]く",en:"Work",ids:["workplace","welfare"]},
+  {ja:"暮[く]らし",en:"Daily life",ids:["home","shopping","transport","medical","office","counsel"]}];
+function roleListHTML(){
+  const lab=r=>P.lang==="en"?esc(r.en):(P.script==="kanji"?esc(stripRuby(r.ruby)):rubyHTML(r.ruby));
+  const used=new Set();
+  const groups=ROLE_GROUPS.map(g=>{
+    const rs=g.ids.map(id=>INDEX.roles.find(r=>r.id===id)).filter(Boolean); rs.forEach(r=>used.add(r.id));
+    return {h:P.lang==="en"?g.en:g.ja,rs};
+  });
+  const rest=INDEX.roles.filter(r=>!used.has(r.id)); if(rest.length) groups.push({h:P.lang==="en"?"Other":"ほか",rs:rest});
+  return groups.filter(g=>g.rs.length).map(g=>`<h3 class="rg">${P.lang==="en"?esc(g.h):rubyHTML(g.h)}</h3><div class="list">${g.rs.map(r=>`<button class="chip" data-act="role" data-id="${r.id}" aria-pressed="${P.role===r.id}">${P.icons?esc(r.icon)+" ":""}${lab(r)}</button>`).join("")}</div>`).join("");
+}
 function panelHTML(){
   switch(S.panel){
   case "dialpick":
     return sheet(t("dialLabel"),`<div class="list"><button class="chip" data-act="dial" data-id="std" aria-pressed="${!P.dialect||P.dialect==="std"}">${t("dialStd")}</button>${((DIALIDX&&DIALIDX.regions)||[]).map(r=>`<button class="chip" data-act="dial" data-id="${r.id}" aria-pressed="${P.dialect===r.id}">${esc(P.lang==="en"?r.en:r.ja)}（${t(r.status==="draft"?"dialDraft":"dialWanted")}）</button>`).join("")}</div>${dialNote()}<a class="lnk" href="${REQUEST_URL}" target="_blank" rel="noopener noreferrer">${t("dialReq")}</a>`);
   case "rolepick":
-    return sheet(t("pickRole"),`<div class="list">${INDEX.roles.map(r=>`<button class="chip" data-act="role" data-id="${r.id}" aria-pressed="${P.role===r.id}">${P.icons?esc(r.icon)+" ":""}${label(r)}</button>`).join("")}</div>`);
+    return sheet(t("pickRole"),roleListHTML());
   case "confirm":
     return `<div class="overlay"><div class="sheet" role="dialog" aria-modal="true" aria-label="${t("speak")}">
      <div class="sentence" style="font-size:2rem">${P.icons&&S.sel?`<span class="ic">${esc(S.sel.icon)}</span>`:""}<span>${S.sel?disp(S.sel):""}</span></div>
