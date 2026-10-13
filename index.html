@@ -40,7 +40,7 @@ button:focus-visible,select:focus-visible,input:focus-visible,textarea:focus-vis
 ruby rt{font-size:.5em}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
 #app{display:flex;flex-direction:column;height:100dvh}
-header.top{display:flex;gap:.4rem;align-items:center;padding:.4rem .6rem;background:var(--hdr-bg);color:var(--hdr-ink);flex-wrap:wrap}
+header.top{display:flex;gap:.3rem;align-items:center;padding:.4rem .6rem;background:var(--hdr-bg);color:var(--hdr-ink);flex-wrap:wrap}
 header.top h1{font-size:1.05rem;margin:0 .4rem 0 0;white-space:nowrap}
 .ver{font-size:.6rem;font-weight:700;margin-left:.4em;padding:.05rem .4rem;border:1px solid currentColor;border-radius:.6rem;vertical-align:middle;white-space:nowrap}
 header.top h1 small{font-weight:normal;font-size:.6em;opacity:.85;margin-left:.3em}
@@ -156,7 +156,7 @@ textarea#buf{resize:vertical}
 
 <script>
 "use strict";
-const VERSION="0.3.0", VARIANT="public";
+const VERSION="0.3.2", VARIANT="public";
 
 /* ---------- 文言（日本語／English） ---------- */
 const T={
@@ -194,7 +194,7 @@ ja:{
  compose:"じぶんの ことば入力",composeOpts:{pick:"えらぶ だけ",both:"えらぶ ＋ 五十音・アルファベット"},predict:"よそうの 数",kana:"50音ばんの ひょうじ",
  kanaOpts:{auto:"自動（スマホは 2 だん）",full:"ぜんぶ 出す",step2:"行 → もじ の 2 だん"},
  composeNote:"つくった ことばは 記録しません。ことば帖に 入れたときだけ 保存します。",
- dialLabel:"ことばの ちいき",dialStd:"ひょうじゅんご（ふつうの ことば）",dialDraft:"ためし",dialWanted:"じゅんびちゅう",dialNoteDraft:"このちいきの ことばは「ためし」です。まだ 地元の かたの かくにんを うけていません。ことばが ある ひょうげんだけ おきかわります。こえは ひょうじゅんごの イントネーションで よみます。",dialNoteWanted:"このちいきの ことばは まだ ありません。ひょうげんは ふつうの ことばのままです。",dialReq:"ごようぼう・まちがいの おしらせは こちら",kindLabel:"もじの しゅるい",kindHira:"ひらがな",kindKata:"カタカナ",kindAbc:"A アルファベット（Alphabet）",layoutLabel:"ならびかた",layoutAbc:"ABC順（Alphabet）",layoutQw:"QWERTY（タイピング順）",
+ dialShort:"標準語",dialLabel:"標準語・お国言葉",dialStd:"標準語",dialDraft:"ためし",dialWanted:"じゅんびちゅう",dialNoteDraft:"この地域の お国言葉は「ためし」です。まだ 地元の かたの かくにんを うけていません。ことばが ある ひょうげんだけ おきかわります。こえは 標準語の イントネーションで よみます。",dialNoteWanted:"この地域の お国言葉は まだ ありません。ひょうげんは 標準語のままです。",dialReq:"ごようぼう・まちがいの おしらせは こちら",kindLabel:"もじの しゅるい",kindHira:"ひらがな",kindKata:"カタカナ",kindAbc:"A アルファベット（Alphabet）",layoutLabel:"ならびかた",layoutAbc:"ABC順（Alphabet）",layoutQw:"QWERTY（タイピング順）",
  voiceNow:"いま つかう 声",voiceLow:"この声は 聞きとりにくい ことが あります。ほかの声を えらぶか、端末の設定で 高品質な声（Samantha・Alex・Enhanced など）を 追加してください。",
  voiceJa:"日本語の 声",voiceEn:"英語の 声",voiceAuto:"自動（よい声を えらぶ）",voiceTest:"きいてみる",voiceNone:"この端末には 声が ありません",
 },
@@ -232,7 +232,7 @@ en:{
  compose:"Own-words input",composeOpts:{pick:"Choose only",both:"Choose + Alphabet / QWERTY"},predict:"Suggestions",kana:"Kana board",
  kanaOpts:{auto:"Auto",full:"Full",step2:"2 steps"},
  composeNote:"Composed text is not recorded. It is saved only when you add it to a phrasebook.",
- dialLabel:"Regional speech",dialStd:"Standard Japanese",dialDraft:"trial",dialWanted:"coming soon",dialNoteDraft:"This regional speech is a trial version and has not yet been checked by local speakers. Only some expressions are replaced. The voice reads with standard intonation.",dialNoteWanted:"No expressions for this region yet. Standard Japanese is used.",dialReq:"Requests and corrections",kindLabel:"Input",kindHira:"Hiragana",kindKata:"Katakana",kindAbc:"Alphabet",layoutLabel:"Layout",layoutAbc:"the Alphabet (A–Z)",layoutQw:"QWERTY (typing order)",
+ dialShort:"Standard",dialLabel:"Standard / Regional speech",dialStd:"Standard Japanese",dialDraft:"trial",dialWanted:"coming soon",dialNoteDraft:"This regional speech is a trial version and has not yet been checked by local speakers. Only some expressions are replaced. The voice reads with standard intonation.",dialNoteWanted:"No expressions for this region yet. Standard Japanese is used.",dialReq:"Requests and corrections",kindLabel:"Input",kindHira:"Hiragana",kindKata:"Katakana",kindAbc:"Alphabet",layoutLabel:"Layout",layoutAbc:"the Alphabet (A–Z)",layoutQw:"QWERTY (typing order)",
  voiceNow:"Current voice",voiceLow:"This voice may sound rough. Pick another voice, or add a high-quality voice (Samantha, Alex, Enhanced…) in your device settings.",
  voiceJa:"Japanese voice",voiceEn:"English voice",voiceAuto:"Auto (pick a good voice)",voiceTest:"Listen",voiceNone:"No voices on this device",
 }};
@@ -732,11 +732,16 @@ function sentenceInner(){
     <button class="btn" data-act="clearsel" ${e?"":"disabled"}>${t("clear")}</button>
    </div>${S.msg?`<p class="note" role="status">${esc(S.msg)}</p>`:""}`;
 }
+function dialName(){
+  if(!P.dialect||P.dialect==="std") return t("dialShort");
+  const r=((DIALIDX&&DIALIDX.regions)||[]).find(x=>x.id===P.dialect); return r?(P.lang==="en"?r.en:r.ja).replace(/[（(].*$/,""):t("dialShort");
+}
 function headerHTML(){
   const r=INDEX&&roleObj(P.role);
   return `<header class="top">
    <h1>${t("app")}<small>${t("tag")}</small><span class="ver" aria-label="version">v${VERSION}${VARIANT==="private"?" private":""}</span></h1>
    <button class="hbtn" data-act="rolepick" data-key="h-role" aria-haspopup="dialog">${r?label(r):""} ▾</button>
+   <button class="hbtn" data-act="dialpick" data-key="h-dial" aria-haspopup="dialog">🗣 ${dialName()} ▾</button>
    <span class="sp"></span>
    <button class="hbtn attn" data-act="attn" data-key="h-attn">📣 ${t("attn")}</button>
    <button class="hbtn help" data-act="help" data-key="h-help">🆘 ${t("help")}</button>
@@ -779,6 +784,8 @@ function sheet(title,inner,extraClose){
 }
 function panelHTML(){
   switch(S.panel){
+  case "dialpick":
+    return sheet(t("dialLabel"),`<div class="list"><button class="chip" data-act="dial" data-id="std" aria-pressed="${!P.dialect||P.dialect==="std"}">${t("dialStd")}</button>${((DIALIDX&&DIALIDX.regions)||[]).map(r=>`<button class="chip" data-act="dial" data-id="${r.id}" aria-pressed="${P.dialect===r.id}">${esc(P.lang==="en"?r.en:r.ja)}（${t(r.status==="draft"?"dialDraft":"dialWanted")}）</button>`).join("")}</div>${dialNote()}<a class="lnk" href="${REQUEST_URL}" target="_blank" rel="noopener noreferrer">${t("dialReq")}</a>`);
   case "rolepick":
     return sheet(t("pickRole"),`<div class="list">${INDEX.roles.map(r=>`<button class="chip" data-act="role" data-id="${r.id}" aria-pressed="${P.role===r.id}">${P.icons?esc(r.icon)+" ":""}${label(r)}</button>`).join("")}</div>`);
   case "confirm":
@@ -954,6 +961,8 @@ document.addEventListener("click",ev=>{
   case "phback": S.step=S.step==="expr"?"intent":"scene";render();break;
   case "closep": S.panel=null;S.msg="";S.form=false;render();break;
   case "rolepick": S.panel="rolepick";render();break;
+  case "dialpick": S.panel="dialpick";render();break;
+  case "dial": P.dialect=id; saveProfile(); setDialect(id).then(()=>{S.panel=null;render()}); break;
   case "role": setRole(id);break;
   case "attn": startAttn();break;
   case "stopattn": stopAttn();break;
