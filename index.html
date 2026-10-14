@@ -57,6 +57,14 @@ main.p1{grid-template-columns:1fr;padding:.4rem;padding-bottom:0}
 .pane{background:var(--panel);border:2px solid var(--line);border-radius:.8rem;padding:.6rem;overflow:auto;min-height:0}
 .pane h2{font-size:.8rem;margin:.2rem 0 .3rem;color:var(--sub);font-weight:700}
 .list{display:flex;flex-direction:column;gap:.35rem}
+.rb{display:inline-block;position:relative;padding-top:.62em;line-height:1.25;text-indent:0}
+.rb>.rt{position:absolute;left:50%;top:0;transform:translateX(-50%);font-size:.5em;line-height:1;white-space:nowrap;font-weight:normal;letter-spacing:0}
+.wiz{display:flex;flex-direction:column;gap:.6rem}
+.wiz .opt{display:flex;flex-direction:column;align-items:flex-start;gap:.3rem;text-align:left;border:2px solid var(--line);background:var(--tile);border-radius:.8rem;padding:.7rem .9rem;font-size:1.1rem;min-height:56px}
+.wiz .opt[aria-pressed="true"]{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent)}
+.wiz .opt .ex{font-size:1.05rem;color:var(--ink)}
+.wiz .opt .lb{font-weight:700}
+.wiz .steps{font-size:.85rem;color:var(--sub)}
 .rg{font-size:.95rem;margin:.7rem 0 .25rem;color:var(--sub)}
 .hbtn.on{background:var(--hdr-ink);color:var(--hdr-bg)}
 .chips{display:flex;flex-wrap:wrap;gap:.35rem}
@@ -159,7 +167,7 @@ textarea#buf{resize:vertical}
 
 <script>
 "use strict";
-const VERSION="0.3.4", VARIANT="public";
+const VERSION="0.3.6", VARIANT="public";
 
 /* ---------- 文言（日本語／English） ---------- */
 const T={
@@ -183,7 +191,7 @@ ja:{
  vols:["小","中","大"],auto:"自動",contacts:"たすけを よぶ 相手（この端末にだけ 保存）",cName:"名前",cTel:"電話番号",cSms:"SMS の宛先",cMail:"メール",
  data:"書き出し・読み込み",exportJson:"JSON で 書き出す",exportCsv:"CSV で 書き出す",inclContacts:"よぶ相手も 含める",
  importF:"ファイルを 読み込む",replace:"置きかえる",append:"追加する",imported:"読み込みました",importErr:"読み込めませんでした",
- about:"このアプリについて",privacy:"入力した文や登録した内容は、この端末の中だけに 保存されます。外部には 送りません。",
+ kLevel:"かんじの はんい",kLevels:{g2:"小学校1・2年まで",g4:"小学校3・4年まで",g6:"小学校5・6年まで",jh:"中学校以上（常用漢字）",all:"高校以上（すべて）"},setupAgain:"はじめの せっていを やりなおす",about:"このアプリについて",privacy:"入力した文や登録した内容は、この端末の中だけに 保存されます。外部には 送りません。",
  heavyNote:"大切な ひょうげんです。ボタンを ながおしして ください。",
  newBook:"新しい帖",bookName:"帖の名前",rename:"名前を かえる",delBook:"帖を けす",edit:"へんしゅう",done:"おわり",
  addPhrase:"ことばを 足す",phText:"ことば（漢字[よみ] でも 可）",phYomi:"よみ（空なら そのまま）",phEn:"English（あれば）",save:"ほぞん",
@@ -221,7 +229,7 @@ en:{
  vols:["Low","Mid","High"],auto:"Auto",contacts:"People to call for help (stored on this device only)",cName:"Name",cTel:"Phone",cSms:"SMS number",cMail:"Email",
  data:"Export / Import",exportJson:"Export as JSON",exportCsv:"Export as CSV",inclContacts:"Include help contacts",
  importF:"Import a file",replace:"Replace",append:"Append",imported:"Imported",importErr:"Could not import",
- about:"About",privacy:"Everything you type or register stays on this device. Nothing is sent out.",
+ kLevel:"Kanji range",kLevels:{g2:"Grade 1–2",g4:"Grade 3–4",g6:"Grade 5–6",jh:"Junior high+ (Joyo)",all:"High school+ (all)"},setupAgain:"Redo first-time setup",about:"About",privacy:"Everything you type or register stays on this device. Nothing is sent out.",
  heavyNote:"This is an important expression. Press and hold the button.",
  newBook:"New book",bookName:"Book name",rename:"Rename",delBook:"Delete book",edit:"Edit",done:"Done",
  addPhrase:"Add phrase",phText:"Text (kanji[reading] allowed)",phYomi:"Reading (blank = as typed)",phEn:"English (optional)",save:"Save",
@@ -246,8 +254,9 @@ const store={
  get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return k in mem?mem[k]:d}},
  set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){mem[k]=v}}
 };
-const DEF_PROFILE={lang:"ja",script:"hira",size:"L",theme:"normal",icons:true,confirm:true,rate:0.9,perPage:"auto",volume:1,role:"highschool",compose:"both",predict:5,kana:"auto",voiceJa:"",voiceEn:"",inputKind:"hira",abcLayout:"abc",dialect:"std"};
+const DEF_PROFILE={lang:"ja",script:"ruby",scriptUser:false,size:"L",theme:"normal",icons:true,confirm:true,rate:0.9,perPage:"auto",volume:1,role:"highschool",compose:"both",predict:5,kana:"auto",voiceJa:"",voiceEn:"",inputKind:"hira",abcLayout:"abc",dialect:"std",kLevel:"all",setupDone:false};
 let P=Object.assign({},DEF_PROFILE,store.get("km.profile",{}));
+if(!P.scriptUser&&P.script==="hira") P.script="ruby";
 let DEV=store.get("km.device",{type:null,auto:true});
 let BOOKS=store.get("km.books",null);
 let CONTACTS=store.get("km.contacts",[]);
@@ -264,20 +273,27 @@ const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&
 const KANJI=/([一-鿿々〆ヶ]+)\[([^\]]+)\]/g;
 const stripRuby=s=>String(s).replace(/\[[^\]]*\]/g,"");
 const readingOf=s=>String(s).replace(KANJI,"$2").replace(/\[[^\]]*\]/g,"");
-const rubyHTML=s=>esc(s).replace(KANJI,"<ruby>$1<rt>$2</rt></ruby>").replace(/\[[^\]]*\]/g,"");
+const rubyHTML=s=>esc(s).replace(KANJI,'<span class="rb">$1<span class="rt">$2</span></span>').replace(/\[[^\]]*\]/g,"");
+/* 漢字の学年（学年別漢字配当表 2017 告示・常用漢字） */
+const KLV={"g": ["一右雨円王音下火花貝学気九休玉金空月犬見五口校左三山子四糸字耳七車手十出女小上森人水正生青夕石赤千川先早草足村大男竹中虫町天田土二日入年白八百文木本名目立力林六", "引羽雲園遠何科夏家歌画回会海絵外角楽活間丸岩顔汽記帰弓牛魚京強教近兄形計元言原戸古午後語工公広交光考行高黄合谷国黒今才細作算止市矢姉思紙寺自時室社弱首秋週春書少場色食心新親図数西声星晴切雪船線前組走多太体台地池知茶昼長鳥朝直通弟店点電刀冬当東答頭同道読内南肉馬売買麦半番父風分聞米歩母方北毎妹万明鳴毛門夜野友用曜来里理話", "悪安暗医委意育員院飲運泳駅央横屋温化荷界開階寒感漢館岸起期客究急級宮球去橋業曲局銀区苦具君係軽血決研県庫湖向幸港号根祭皿仕死使始指歯詩次事持式実写者主守取酒受州拾終習集住重宿所暑助昭消商章勝乗植申身神真深進世整昔全相送想息速族他打対待代第題炭短談着注柱丁帳調追定庭笛鉄転都度投豆島湯登等動童農波配倍箱畑発反坂板皮悲美鼻筆氷表秒病品負部服福物平返勉放味命面問役薬由油有遊予羊洋葉陽様落流旅両緑礼列練路和", "愛案以衣位茨印英栄媛塩岡億加果貨課芽賀改械害街各覚潟完官管関観願岐希季旗器機議求泣給挙漁共協鏡競極熊訓軍郡群径景芸欠結建健験固功好香候康佐差菜最埼材崎昨札刷察参産散残氏司試児治滋辞鹿失借種周祝順初松笑唱焼照城縄臣信井成省清静席積折節説浅戦選然争倉巣束側続卒孫帯隊達単置仲沖兆低底的典伝徒努灯働特徳栃奈梨熱念敗梅博阪飯飛必票標不夫付府阜富副兵別辺変便包法望牧末満未民無約勇要養浴利陸良料量輪類令冷例連老労録", "圧囲移因永営衛易益液演応往桜可仮価河過快解格確額刊幹慣眼紀基寄規喜技義逆久旧救居許境均禁句型経潔件険検限現減故個護効厚耕航鉱構興講告混査再災妻採際在財罪殺雑酸賛士支史志枝師資飼示似識質舎謝授修述術準序招証象賞条状常情織職制性政勢精製税責績接設絶祖素総造像増則測属率損貸態団断築貯張停提程適統堂銅導得毒独任燃能破犯判版比肥非費備評貧布婦武復複仏粉編弁保墓報豊防貿暴脈務夢迷綿輸余容略留領歴", "胃異遺域宇映延沿恩我灰拡革閣割株干巻看簡危机揮貴疑吸供胸郷勤筋系敬警劇激穴券絹権憲源厳己呼誤后孝皇紅降鋼刻穀骨困砂座済裁策冊蚕至私姿視詞誌磁射捨尺若樹収宗就衆従縦縮熟純処署諸除承将傷障蒸針仁垂推寸盛聖誠舌宣専泉洗染銭善奏窓創装層操蔵臓存尊退宅担探誕段暖値宙忠著庁頂腸潮賃痛敵展討党糖届難乳認納脳派拝背肺俳班晩否批秘俵腹奮並陛閉片補暮宝訪亡忘棒枚幕密盟模訳郵優預幼欲翌乱卵覧裏律臨朗論"], "j": "亜哀挨愛曖悪握圧扱宛嵐安案暗以衣位囲医依委威為畏胃尉異移萎偉椅彙意違維慰遺緯域育一壱逸茨芋引印因咽姻員院淫陰飲隠韻右宇羽雨唄鬱畝浦運雲永泳英映栄営詠影鋭衛易疫益液駅悦越謁閲円延沿炎怨宴媛援園煙猿遠鉛塩演縁艶汚王凹央応往押旺欧殴桜翁奥横岡屋億憶臆虞乙俺卸音恩温穏下化火加可仮何花佳価果河苛科架夏家荷華菓貨渦過嫁暇禍靴寡歌箇稼課蚊牙瓦我画芽賀雅餓介回灰会快戒改怪拐悔海界皆械絵開階塊楷解潰壊懐諧貝外劾害崖涯街慨蓋該概骸垣柿各角拡革格核殻郭覚較隔閣確獲嚇穫学岳楽額顎掛潟括活喝渇割葛滑褐轄且株釜鎌刈干刊甘汗缶完肝官冠巻看陥乾勘患貫寒喚堪換敢棺款間閑勧寛幹感漢慣管関歓監緩憾還館環簡観韓艦鑑丸含岸岩玩眼頑顔願企伎危机気岐希忌汽奇祈季紀軌既記起飢鬼帰基寄規亀喜幾揮期棋貴棄毀旗器畿輝機騎技宜偽欺義疑儀戯擬犠議菊吉喫詰却客脚逆虐九久及弓丘旧休吸朽臼求究泣急級糾宮救球給嗅窮牛去巨居拒拠挙虚許距魚御漁凶共叫狂京享供協況峡挟狭恐恭胸脅強教郷境橋矯鏡競響驚仰暁業凝曲局極玉巾斤均近金菌勤琴筋僅禁緊錦謹襟吟銀区句苦駆具惧愚空偶遇隅串屈掘窟熊繰君訓勲薫軍郡群兄刑形系径茎係型契計恵啓掲渓経蛍敬景軽傾携継詣慶憬稽憩警鶏芸迎鯨隙劇撃激桁欠穴血決結傑潔月犬件見券肩建研県倹兼剣拳軒健険圏堅検嫌献絹遣権憲賢謙鍵繭顕験懸元幻玄言弦限原現舷減源厳己戸古呼固股虎孤弧故枯個庫湖雇誇鼓錮顧五互午呉後娯悟碁語誤護口工公勾孔功巧広甲交光向后好江考行坑孝抗攻更効幸拘肯侯厚恒洪皇紅荒郊香候校耕航貢降高康控梗黄喉慌港硬絞項溝鉱構綱酵稿興衡鋼講購乞号合拷剛傲豪克告谷刻国黒穀酷獄骨駒込頃今困昆恨根婚混痕紺魂墾懇左佐沙査砂唆差詐鎖座挫才再災妻采砕宰栽彩採済祭斎細菜最裁債催塞歳載際埼在材剤財罪崎作削昨柵索策酢搾錯咲冊札刷刹拶殺察撮擦雑皿三山参桟蚕惨産傘散算酸賛残斬暫士子支止氏仕史司四市矢旨死糸至伺志私使刺始姉枝祉肢姿思指施師恣紙脂視紫詞歯嗣試詩資飼誌雌摯賜諮示字寺次耳自似児事侍治持時滋慈辞磁餌璽鹿式識軸七𠮟失室疾執湿嫉漆質実芝写社車舎者射捨赦斜煮遮謝邪蛇尺借酌釈爵若弱寂手主守朱取狩首殊珠酒腫種趣寿受呪授需儒樹収囚州舟秀周宗拾秋臭修袖終羞習週就衆集愁酬醜蹴襲十汁充住柔重従渋銃獣縦叔祝宿淑粛縮塾熟出述術俊春瞬旬巡盾准殉純循順準潤遵処初所書庶暑署緒諸女如助序叙徐除小升少召匠床抄肖尚招承昇松沼昭宵将消症祥称笑唱商渉章紹訟勝掌晶焼焦硝粧詔証象傷奨照詳彰障憧衝賞償礁鐘上丈冗条状乗城浄剰常情場畳蒸縄壌嬢錠譲醸色拭食植殖飾触嘱織職辱尻心申伸臣芯身辛侵信津神唇娠振浸真針深紳進森診寝慎新審震薪親人刃仁尽迅甚陣尋腎須図水吹垂炊帥粋衰推酔遂睡穂随髄枢崇数据杉裾寸瀬是井世正生成西声制姓征性青斉政星牲省凄逝清盛婿晴勢聖誠精製誓静請整醒税夕斥石赤昔析席脊隻惜戚責跡積績籍切折拙窃接設雪摂節説舌絶千川仙占先宣専泉浅洗染扇栓旋船戦煎羨腺詮践箋銭潜線遷選薦繊鮮全前善然禅漸膳繕狙阻祖租素措粗組疎訴塑遡礎双壮早争走奏相荘草送倉捜挿桑巣掃曹曽爽窓創喪痩葬装僧想層総遭槽踪操燥霜騒藻造像増憎蔵贈臓即束足促則息捉速側測俗族属賊続卒率存村孫尊損遜他多汰打妥唾堕惰駄太対体耐待怠胎退帯泰堆袋逮替貸隊滞態戴大代台第題滝宅択沢卓拓託濯諾濁但達脱奪棚誰丹旦担単炭胆探淡短嘆端綻誕鍛団男段断弾暖談壇地池知値恥致遅痴稚置緻竹畜逐蓄築秩窒茶着嫡中仲虫沖宙忠抽注昼柱衷酎鋳駐著貯丁弔庁兆町長挑帳張彫眺釣頂鳥朝貼超腸跳徴嘲潮澄調聴懲直勅捗沈珍朕陳賃鎮追椎墜通痛塚漬坪爪鶴低呈廷弟定底抵邸亭貞帝訂庭逓停偵堤提程艇締諦泥的笛摘滴適敵溺迭哲鉄徹撤天典店点展添転塡田伝殿電斗吐妬徒途都渡塗賭土奴努度怒刀冬灯当投豆東到逃倒凍唐島桃討透党悼盗陶塔搭棟湯痘登答等筒統稲踏糖頭謄藤闘騰同洞胴動堂童道働銅導瞳峠匿特得督徳篤毒独読栃凸突届屯豚頓貪鈍曇丼那奈内梨謎鍋南軟難二尼弐匂肉虹日入乳尿任妊忍認寧熱年念捻粘燃悩納能脳農濃把波派破覇馬婆罵拝杯背肺俳配排敗廃輩売倍梅培陪媒買賠白伯拍泊迫剝舶博薄麦漠縛爆箱箸畑肌八鉢発髪伐抜罰閥反半氾犯帆汎伴判坂阪板版班畔般販斑飯搬煩頒範繁藩晩番蛮盤比皮妃否批彼披肥非卑飛疲秘被悲扉費碑罷避尾眉美備微鼻膝肘匹必泌筆姫百氷表俵票評漂標苗秒病描猫品浜貧賓頻敏瓶不夫父付布扶府怖阜附訃負赴浮婦符富普腐敷膚賦譜侮武部舞封風伏服副幅復福腹複覆払沸仏物粉紛雰噴墳憤奮分文聞丙平兵併並柄陛閉塀幣弊蔽餅米壁璧癖別蔑片辺返変偏遍編弁便勉歩保哺捕補舗母募墓慕暮簿方包芳邦奉宝抱放法泡胞俸倣峰砲崩訪報蜂豊飽褒縫亡乏忙坊妨忘防房肪某冒剖紡望傍帽棒貿貌暴膨謀頰北木朴牧睦僕墨撲没勃堀本奔翻凡盆麻摩磨魔毎妹枚昧埋幕膜枕又末抹万満慢漫未味魅岬密蜜脈妙民眠矛務無夢霧娘名命明迷冥盟銘鳴滅免面綿麺茂模毛妄盲耗猛網目黙門紋問冶夜野弥厄役約訳薬躍闇由油喩愉諭輸癒唯友有勇幽悠郵湧猶裕遊雄誘憂融優与予余誉預幼用羊妖洋要容庸揚揺葉陽溶腰様瘍踊窯養擁謡曜抑沃浴欲翌翼拉裸羅来雷頼絡落酪辣乱卵覧濫藍欄吏利里理痢裏履璃離陸立律慄略柳流留竜粒隆硫侶旅虜慮了両良料涼猟陵量僚領寮療瞭糧力緑林厘倫輪隣臨瑠涙累塁類令礼冷励戻例鈴零霊隷齢麗暦歴列劣烈裂恋連廉練錬呂炉賂路露老労弄郎朗浪廊楼漏籠六録麓論和話賄脇惑枠湾腕"};
+const KSET=(()=>{const m={};KLV.g.forEach((g,i)=>{for(const c of g)m[c]=i+1});for(const c of KLV.j) if(!m[c]) m[c]=7;return m})();
+const KMAX={g2:2,g4:4,g6:6,jh:7,all:99};
+const kanjiOK=c=>{const g=KSET[c]||(/[々〆ヶ]/.test(c)?1:8); return g<=(KMAX[P.kLevel]||99)};
+/* 学年より上の字を含む熟語は、熟語ごとかなにする */
+const lvRuby=s=>String(s).replace(KANJI,(m,b,r)=>[...b].every(kanjiOK)?m:r);
 const uid=()=>Math.random().toString(36).slice(2,9);
 const today=()=>new Date().toISOString().slice(0,10);
 /* 表示：obj は {hira, ruby, en} */
 function disp(o){
   if(P.lang==="en") return esc(o.en||stripRuby(o.ruby||o.hira));
   if(P.script==="hira") return esc(o.hira);
-  if(P.script==="kanji") return esc(stripRuby(o.ruby));
-  return rubyHTML(o.ruby);
+  if(P.script==="kanji") return esc(stripRuby(lvRuby(o.ruby)));
+  return rubyHTML(lvRuby(o.ruby));
 }
 function plain(o){
   if(P.lang==="en") return o.en||stripRuby(o.ruby||o.hira);
   if(P.script==="hira") return o.hira;
-  return stripRuby(o.ruby);
+  return stripRuby(lvRuby(o.ruby));
 }
 function speakText(o){return P.lang==="en"?(o.en||""):(o.ascii?o.en:o.hira)}
 const say=m=>{const l=document.getElementById("live");if(l){l.textContent="";setTimeout(()=>l.textContent=m,30)}};
@@ -740,6 +756,10 @@ function sentenceInner(){
     <button class="btn" data-act="clearsel" ${e?"":"disabled"}>${t("clear")}</button>
    </div>${S.msg?`<p class="note" role="status">${esc(S.msg)}</p>`:""}`;
 }
+function scriptShort(){
+  if(P.lang==="en") return "Aa";
+  return P.script==="hira"?"あ":(P.script==="kanji"?"漢":'<span class="rb">漢<span class="rt">かん</span></span>');
+}
 function dialName(){
   if(!P.dialect||P.dialect==="std") return t("dialShort");
   const r=((DIALIDX&&DIALIDX.regions)||[]).find(x=>x.id===P.dialect); return r?(P.lang==="en"?r.en:r.ja).replace(/[（(].*$/,""):t("dialShort");
@@ -749,6 +769,7 @@ function headerHTML(){
   return `<header class="top">
    <h1>${t("app")}<small>${t("tag")}</small><span class="ver" aria-label="version">v${VERSION}${VARIANT==="private"?" private":""}</span></h1>
    <button class="hbtn" data-act="rolepick" data-key="h-role" aria-haspopup="dialog">${r?label(r):""} ▾</button>
+   <button class="hbtn" data-act="scriptcycle" data-key="h-script" aria-label="${t("script")}：${P.lang==="en"?"":t("scripts")[P.script]}" title="${t("script")}：${P.lang==="en"?"":t("scripts")[P.script]}">${scriptShort()}</button>
    <button class="hbtn ${P.dialect&&P.dialect!=="std"?"on":""}" data-act="dialpick" data-key="h-dial" aria-haspopup="dialog">🗣 ${dialName()} ▾</button>
    <span class="sp"></span>
    <button class="hbtn attn" data-act="attn" data-key="h-attn">📣 ${t("attn")}</button>
@@ -795,16 +816,41 @@ const ROLE_GROUPS=[
   {ja:"働[はたら]く",en:"Work",ids:["workplace","welfare"]},
   {ja:"暮[く]らし",en:"Daily life",ids:["home","shopping","transport","medical","office","counsel"]}];
 function roleListHTML(){
-  const lab=r=>P.lang==="en"?esc(r.en):(P.script==="kanji"?esc(stripRuby(r.ruby)):rubyHTML(r.ruby));
+  const lab=r=>disp({hira:r.hira,ruby:r.ruby,en:r.en});
   const used=new Set();
   const groups=ROLE_GROUPS.map(g=>{
     const rs=g.ids.map(id=>INDEX.roles.find(r=>r.id===id)).filter(Boolean); rs.forEach(r=>used.add(r.id));
-    return {h:P.lang==="en"?g.en:g.ja,rs};
+    return {h:disp({hira:readingOf(g.ja),ruby:g.ja,en:g.en}),rs};
   });
-  const rest=INDEX.roles.filter(r=>!used.has(r.id)); if(rest.length) groups.push({h:P.lang==="en"?"Other":"ほか",rs:rest});
-  return groups.filter(g=>g.rs.length).map(g=>`<h3 class="rg">${P.lang==="en"?esc(g.h):rubyHTML(g.h)}</h3><div class="list">${g.rs.map(r=>`<button class="chip" data-act="role" data-id="${r.id}" aria-pressed="${P.role===r.id}">${P.icons?esc(r.icon)+" ":""}${lab(r)}</button>`).join("")}</div>`).join("");
+  const rest=INDEX.roles.filter(r=>!used.has(r.id)); if(rest.length) groups.push({h:disp({hira:"ほか",ruby:"ほか",en:"Other"}),rs:rest});
+  return groups.filter(g=>g.rs.length).map(g=>`<h3 class="rg">${g.h}</h3><div class="list">${g.rs.map(r=>`<button class="chip" data-act="role" data-id="${r.id}" aria-pressed="${P.role===r.id}">${P.icons?esc(r.icon)+" ":""}${lab(r)}</button>`).join("")}</div>`).join("");
+}
+const WIZ_SAMPLE="先生[せんせい]、教室[きょうしつ]で もう一度[いちど] 説明[せつめい]して ください";
+const WIZ_HIRA="せんせい、 きょうしつで もういちど せつめいして ください";
+function sampleAs(script,lv){const o=P.script,l=P.kLevel;P.script=script;P.kLevel=lv;const h=disp({hira:WIZ_HIRA,ruby:WIZ_SAMPLE,en:""});P.script=o;P.kLevel=l;return h}
+function wizardHTML(){
+  const w=S.wiz||(S.wiz={step:1,script:null,lv:P.kLevel||"g6"});
+  let title,body;
+  const opt=(act,id,lb,ex,on)=>`<button class="opt" data-act="${act}" data-id="${id}" data-key="w-${act}-${id}" aria-pressed="${on}"><span class="lb">${lb}</span><span class="ex">${ex}</span></button>`;
+  if(w.step===1){
+    title="もじを えらんで ください";
+    body=opt("wscript","hira","ひらがな（わかちがき）",esc(WIZ_HIRA),w.script==="hira")+opt("wscript","kanji","かんじ",sampleAs("ruby","all"),w.script==="kanji");
+  }else if(w.step===2){
+    title="どこまで かんじに しますか";
+    const L=[["g2","しょうがっこう 1・2ねん（ていがくねん）まで"],["g4","しょうがっこう 3・4ねん（ちゅうがくねん）まで"],["g6","しょうがっこう 5・6ねん（こうがくねん）まで"],["jh","ちゅうがっこう いじょう（じょうよう かんじ）"],["all","こうとう がっこう いじょう（すべての かんじ）"]];
+    body=L.map(([k,l])=>opt("wlv",k,l,sampleAs("ruby",k),w.lv===k)).join("");
+  }else{
+    title="ふりがなを つけますか";
+    body=opt("wfuri","on","ふりがなを つける",sampleAs("ruby",w.lv),false)+opt("wfuri","off","ふりがなを つけない",sampleAs("kanji",w.lv),false);
+  }
+  const steps=w.script==="hira"?"":`<p class="steps">${w.step} / 3</p>`;
+  const back=w.step>1?`<button class="btn" data-act="wback">◀ もどる</button>`:"";
+  return `<div class="overlay"><div class="sheet" role="dialog" aria-modal="true" aria-label="${esc(title)}">
+   <div class="hd"><h2>${esc(title)}</h2><button class="btn small" data-act="wskip" data-key="p-close">あとで</button></div>
+   ${steps}<p class="note">あとから「せってい」で かえられます。</p><div class="wiz">${body}</div><div class="row" style="margin-top:.6rem">${back}</div></div></div>`;
 }
 function panelHTML(){
+  if(!P.setupDone&&P.lang==="ja") return wizardHTML();
   switch(S.panel){
   case "dialpick":
     return sheet(t("dialLabel"),`<div class="list"><button class="chip" data-act="dial" data-id="std" aria-pressed="${!P.dialect||P.dialect==="std"}">${t("dialStd")}</button>${((DIALIDX&&DIALIDX.regions)||[]).map(r=>`<button class="chip" data-act="dial" data-id="${r.id}" aria-pressed="${P.dialect===r.id}">${esc(P.lang==="en"?r.en:r.ja)}（${t(r.status==="draft"?"dialDraft":"dialWanted")}）</button>`).join("")}</div>${dialNote()}<a class="lnk" href="${REQUEST_URL}" target="_blank" rel="noopener noreferrer">${t("dialReq")}</a>`);
@@ -862,6 +908,7 @@ function settingsHTML(){
     <label class="f">${t("cMail")}</label><input type="email" data-c="${i}" data-f="mail" value="${esc(c.mail||"")}"></details>`}).join("");
   return `<div class="two">
    <div><label class="f" for="s-lang">${t("lang")}</label><select id="s-lang">${opt("ja",P.lang,"日本語")}${opt("en",P.lang,"English")}</select></div>
+   <div><label class="f" for="s-klv">${t("kLevel")}</label><select id="s-klv">${["g2","g4","g6","jh","all"].map(k=>opt(k,P.kLevel,t("kLevels")[k])).join("")}</select><button class="btn small" data-act="setupagain" style="margin-top:.3rem">${t("setupAgain")}</button></div>
    <div><label class="f" for="s-script">${t("script")}</label><select id="s-script">${["hira","kanji","ruby"].map(k=>opt(k,P.script,t("scripts")[k])).join("")}</select></div>
    <div><label class="f" for="s-dial">${t("dialLabel")}</label><select id="s-dial">${opt("std",P.dialect,t("dialStd"))}${((DIALIDX&&DIALIDX.regions)||[]).map(r=>opt(r.id,P.dialect,(P.lang==="en"?r.en:r.ja)+"（"+t(r.status==="draft"?"dialDraft":"dialWanted")+"）")).join("")}</select>${dialNote()}<a class="lnk" href="${REQUEST_URL}" target="_blank" rel="noopener noreferrer">${t("dialReq")}</a></div>
    <div><label class="f" for="s-dev">${t("device")}</label><select id="s-dev">${opt("auto",DEV.auto?"auto":DEV.type,t("devAuto")+"（"+t("devs")[detectDevice()]+"）")}${["desktop","laptop","tablet","phone"].map(k=>opt(k,DEV.auto?"auto":DEV.type,t("devs")[k])).join("")}</select></div>
@@ -984,6 +1031,13 @@ document.addEventListener("click",ev=>{
   case "closep": S.panel=null;S.msg="";S.form=false;render();break;
   case "rolepick": S.panel="rolepick";render();break;
   case "dialpick": S.panel="dialpick";render();break;
+  case "wscript": if(id==="hira"){P.script="hira";P.scriptUser=true;P.setupDone=true;S.wiz=null;saveProfile()} else {S.wiz.script="kanji";S.wiz.step=2} render(); break;
+  case "wlv": S.wiz.lv=id; S.wiz.step=3; render(); break;
+  case "wfuri": P.kLevel=S.wiz.lv; P.script=id==="on"?"ruby":"kanji"; P.scriptUser=true; P.setupDone=true; S.wiz=null; saveProfile(); render(); break;
+  case "wback": S.wiz.step=Math.max(1,S.wiz.step-1); render(); break;
+  case "wskip": P.setupDone=true; S.wiz=null; saveProfile(); render(); break;
+  case "setupagain": P.setupDone=false; S.wiz=null; S.panel=null; render(); break;
+  case "scriptcycle": {const o=["ruby","hira","kanji"]; P.script=o[(o.indexOf(P.script)+1)%3]; P.scriptUser=true; saveProfile(); render(); break}
   case "dial": P.dialect=id; saveProfile(); setDialect(id).then(()=>{S.panel=null;render()}); break;
   case "role": setRole(id);break;
   case "attn": startAttn();break;
@@ -1046,7 +1100,8 @@ document.addEventListener("change",ev=>{
   if(el.dataset&&el.dataset.c!==undefined){const i=+el.dataset.c; CONTACTS[i]=CONTACTS[i]||{}; CONTACTS[i][el.dataset.f]=el.value.trim(); saveContacts(); return}
   if(!id.startsWith("s-")) return;
   if(id==="s-lang")P.lang=el.value;
-  else if(id==="s-script")P.script=el.value;
+  else if(id==="s-script"){P.script=el.value;P.scriptUser=true}
+  else if(id==="s-klv")P.kLevel=el.value;
   else if(id==="s-dial"){P.dialect=el.value; saveProfile(); setDialect(P.dialect).then(()=>render()); return}
   else if(id==="s-dev"){ if(el.value==="auto"){DEV={type:null,auto:true}}else{DEV={type:el.value,auto:false}} saveDev(); S.step="scene" }
   else if(id==="s-size")P.size=el.value;
