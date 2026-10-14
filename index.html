@@ -59,6 +59,8 @@ main.p1{grid-template-columns:1fr;padding:.4rem;padding-bottom:0}
 .list{display:flex;flex-direction:column;gap:.35rem}
 .rb{display:inline-block;position:relative;padding-top:.62em;line-height:1.25;text-indent:0}
 .rb>.rt{position:absolute;left:50%;top:0;transform:translateX(-50%);font-size:.5em;line-height:1;white-space:nowrap;font-weight:normal;letter-spacing:0}
+.scchk{display:flex;flex-wrap:wrap;gap:.2rem .8rem;font-size:.9rem}
+.scchk label{display:flex;align-items:center;gap:.25rem;min-height:36px}
 .wiz{display:flex;flex-direction:column;gap:.6rem}
 .wiz .opt{display:flex;flex-direction:column;align-items:flex-start;gap:.3rem;text-align:left;border:2px solid var(--line);background:var(--tile);border-radius:.8rem;padding:.7rem .9rem;font-size:1.1rem;min-height:56px}
 .wiz .opt[aria-pressed="true"]{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent)}
@@ -122,7 +124,9 @@ select,input[type=text],input[type=tel],input[type=email],textarea{font:inherit;
 details{margin:.5rem 0;border:1px solid var(--line);border-radius:.6rem;padding:.3rem .6rem}
 summary{cursor:pointer;font-weight:700;min-height:40px;display:flex;align-items:center}
 .tabs{display:flex;gap:.3rem;flex-wrap:wrap;margin-bottom:.5rem}
-.modes{display:flex;gap:.4rem;padding:.3rem .5rem 0}
+.modes{display:flex;gap:.4rem;padding:.3rem .5rem 0;overflow-x:auto;flex-wrap:nowrap}
+.modes .chip{white-space:nowrap;flex:none}
+@media (max-width:480px){.modes .chip{min-height:40px;padding:.2rem .6rem;font-size:.95rem}}
 .board{display:grid;gap:.35rem;margin:.4rem 0}
 .board.rtl{direction:rtl}
 .board.rtl>*{direction:ltr}
@@ -167,7 +171,7 @@ textarea#buf{resize:vertical}
 
 <script>
 "use strict";
-const VERSION="0.3.6", VARIANT="public";
+const VERSION="0.4.0", VARIANT="public";
 
 /* ---------- 文言（日本語／English） ---------- */
 const T={
@@ -191,7 +195,7 @@ ja:{
  vols:["小","中","大"],auto:"自動",contacts:"たすけを よぶ 相手（この端末にだけ 保存）",cName:"名前",cTel:"電話番号",cSms:"SMS の宛先",cMail:"メール",
  data:"書き出し・読み込み",exportJson:"JSON で 書き出す",exportCsv:"CSV で 書き出す",inclContacts:"よぶ相手も 含める",
  importF:"ファイルを 読み込む",replace:"置きかえる",append:"追加する",imported:"読み込みました",importErr:"読み込めませんでした",
- kLevel:"かんじの はんい",kLevels:{g2:"小学校1・2年まで",g4:"小学校3・4年まで",g6:"小学校5・6年まで",jh:"中学校以上（常用漢字）",all:"高校以上（すべて）"},setupAgain:"はじめの せっていを やりなおす",about:"このアプリについて",privacy:"入力した文や登録した内容は、この端末の中だけに 保存されます。外部には 送りません。",
+ lunchKind:"昼ごはんの かたち",sceneShow:"出す ばめん",kLevel:"かんじの はんい",kLevels:{g2:"小学校1・2年まで",g4:"小学校3・4年まで",g6:"小学校5・6年まで",jh:"中学校以上（常用漢字）",all:"高校以上（すべて）"},setupAgain:"はじめの せっていを やりなおす",about:"このアプリについて",privacy:"入力した文や登録した内容は、この端末の中だけに 保存されます。外部には 送りません。",
  heavyNote:"大切な ひょうげんです。ボタンを ながおしして ください。",
  newBook:"新しい帖",bookName:"帖の名前",rename:"名前を かえる",delBook:"帖を けす",edit:"へんしゅう",done:"おわり",
  addPhrase:"ことばを 足す",phText:"ことば（漢字[よみ] でも 可）",phYomi:"よみ（空なら そのまま）",phEn:"English（あれば）",save:"ほぞん",
@@ -229,7 +233,7 @@ en:{
  vols:["Low","Mid","High"],auto:"Auto",contacts:"People to call for help (stored on this device only)",cName:"Name",cTel:"Phone",cSms:"SMS number",cMail:"Email",
  data:"Export / Import",exportJson:"Export as JSON",exportCsv:"Export as CSV",inclContacts:"Include help contacts",
  importF:"Import a file",replace:"Replace",append:"Append",imported:"Imported",importErr:"Could not import",
- kLevel:"Kanji range",kLevels:{g2:"Grade 1–2",g4:"Grade 3–4",g6:"Grade 5–6",jh:"Junior high+ (Joyo)",all:"High school+ (all)"},setupAgain:"Redo first-time setup",about:"About",privacy:"Everything you type or register stays on this device. Nothing is sent out.",
+ lunchKind:"Lunch type",sceneShow:"Scenes to show",kLevel:"Kanji range",kLevels:{g2:"Grade 1–2",g4:"Grade 3–4",g6:"Grade 5–6",jh:"Junior high+ (Joyo)",all:"High school+ (all)"},setupAgain:"Redo first-time setup",about:"About",privacy:"Everything you type or register stays on this device. Nothing is sent out.",
  heavyNote:"This is an important expression. Press and hold the button.",
  newBook:"New book",bookName:"Book name",rename:"Rename",delBook:"Delete book",edit:"Edit",done:"Done",
  addPhrase:"Add phrase",phText:"Text (kanji[reading] allowed)",phYomi:"Reading (blank = as typed)",phEn:"English (optional)",save:"Save",
@@ -254,7 +258,7 @@ const store={
  get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return k in mem?mem[k]:d}},
  set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){mem[k]=v}}
 };
-const DEF_PROFILE={lang:"ja",script:"ruby",scriptUser:false,size:"L",theme:"normal",icons:true,confirm:true,rate:0.9,perPage:"auto",volume:1,role:"highschool",compose:"both",predict:5,kana:"auto",voiceJa:"",voiceEn:"",inputKind:"hira",abcLayout:"abc",dialect:"std",kLevel:"all",setupDone:false};
+const DEF_PROFILE={lang:"ja",script:"ruby",scriptUser:false,size:"L",theme:"normal",icons:true,confirm:true,rate:0.9,perPage:"auto",volume:1,role:"highschool",compose:"both",predict:5,kana:"auto",voiceJa:"",voiceEn:"",inputKind:"hira",abcLayout:"abc",dialect:"std",kLevel:"all",setupDone:false,lunch:{},hidden:{}};
 let P=Object.assign({},DEF_PROFILE,store.get("km.profile",{}));
 if(!P.scriptUser&&P.script==="hira") P.script="ruby";
 let DEV=store.get("km.device",{type:null,auto:true});
@@ -336,7 +340,7 @@ const REQUEST_URL="https://github.com/toitoitoi-lab/kotomusubi/issues/new";
 const normStd=h=>h.replace(/[\s、。，．！？!?]/g,"");
 function hydrate(id){
   return RAW[id].map(r=>{
-    const o={id:r[0],scene:r[1],intent:r[2],level:r[3],hira:r[4],ruby:r[5],en:r[6],icon:r[7],role:id};
+    const o={id:r[0],scene:r[1],intent:r[2],level:r[3],hira:r[4],ruby:r[5],en:r[6],icon:r[7],sub:r[8]||"",role:id};
     if((DIAL.map||DIAL.rules)&&!isHeavy(o)){
       let d=DIAL.map&&DIAL.map.get(normStd(r[4]));
       if(!d&&DIAL.rules){let t=r[4]; for(const [re,rp] of DIAL.rules) t=t.replace(re,rp); if(t!==r[4]) d=t}
@@ -367,7 +371,16 @@ async function setDialect(id){
   if(S.sel&&!S.sel.free) S.sel=null;
 }
 const roleObj=id=>INDEX.roles.find(r=>r.id===id);
-const scenesOf=id=>INDEX.scenes.filter(s=>s.role===id);
+const allScenesOf=id=>INDEX.scenes.filter(s=>s.role===id);
+const lunchOf=role=>(P.lunch&&P.lunch[role])||(INDEX.lunchDefault||{})[role]||"bento";
+const lunchKind=role=>(INDEX.lunchKinds||[]).find(k=>k.id===lunchOf(role));
+const hiddenOf=role=>(P.hidden&&P.hidden[role])||(INDEX.hiddenDefault||{})[role]||[];
+const okSub=e=>!e.sub||e.sub===lunchOf(e.role);
+const scenesOf=id=>allScenesOf(id).filter(s=>!hiddenOf(id).includes(s.id)).map(s=>{
+  if(s.id!=="lunch") return s; const k=lunchKind(id); if(!k) return s;
+  return {...s,hira:s.hira+"（"+k.hira+"）",ruby:s.ruby+"（"+k.ruby+"）",kanji:s.kanji+"（"+k.kanji+"）",en:s.en+" ("+k.en+")"};
+});
+function fixScene(){const sc=scenesOf(P.role); if(!sc.find(x=>x.id===S.scene)) S.scene=sc[0]&&sc[0].id}
 const label=o=>disp({hira:o.hira,ruby:o.ruby,en:o.en});
 const isHeavy=e=>e&&((e.intent==="trouble"&&e.level===3)||(e.role==="counsel"&&(e.level===3||e.intent==="trouble"||e.intent==="feeling")));
 
@@ -597,7 +610,7 @@ function smallChar(c0){
   for(const [a,b] of SMALL){ const r=c===a?b:(c===b?a:null); if(r) return kata?toKata(r):r }
   return null;
 }
-function sceneExprs(){return (CACHE[P.role]||[]).filter(e=>e.scene===S.scene)}
+function sceneExprs(){return (CACHE[P.role]||[]).filter(e=>e.scene===S.scene&&okSub(e))}
 function predictions(){
   const n=+P.predict; if(!n||!S.buf.trim()) return [];
   const en=isEn()||isAsciiText(S.buf.trim());
@@ -706,7 +719,7 @@ function updateLive(){
 /* ---------- 描画 ---------- */
 const $a=document.getElementById("app"), $p=document.getElementById("printArea");
 function currentCandidates(){
-  const all=(CACHE[P.role]||[]).filter(e=>e.scene===S.scene&&e.intent===S.intent&&(!S.level||e.level===S.level));
+  const all=(CACHE[P.role]||[]).filter(e=>e.scene===S.scene&&okSub(e)&&e.intent===S.intent&&(!S.level||e.level===S.level));
   return all;
 }
 function tileHTML(e,i,pressed,extra=""){
@@ -728,7 +741,8 @@ function candHTML(){
   const start=S.page*pp, cur=list.slice(start,start+pp);
   const lvl=`<div class="chips" role="group" aria-label="${t("level")}">${t("lv").map((n,i)=>`<button class="chip" data-act="level" data-id="${i}" data-key="l${i}" aria-pressed="${S.level===i}">${esc(n)}</button>`).join("")}</div>`;
   const selId=S.sel&&S.sel.id;
-  return `<h2>${t("level")}</h2>${lvl}
+  const lk=S.scene==="lunch"&&(INDEX.lunchKinds||[]).length?`<h2>${t("lunchKind")}</h2><div class="chips" role="group" aria-label="${t("lunchKind")}">${INDEX.lunchKinds.map(k=>`<button class="chip sm" data-act="lunchkind" data-id="${k.id}" data-key="lk-${k.id}" aria-pressed="${lunchOf(P.role)===k.id}">${disp({hira:k.hira,ruby:k.ruby,en:k.en})}</button>`).join("")}</div>`:"";
+  return `${lk}<h2>${t("level")}</h2>${lvl}
   <p class="note" style="margin:.3rem 0 0">${t("levelHelp")} ● ${esc(t("lv")[1])} ／ ●● ${esc(t("lv")[2])} ／ ●●● ${esc(t("lv")[3])}</p>
   <div class="grid" style="margin-top:.5rem">${cur.map((e,k)=>tileHTML(e,start+k,selId===e.id)).join("")}</div>
   <div class="pager"><button class="btn small" data-act="prev" ${S.page<=0?"disabled":""}>◀ ${t("prev")}</button>
@@ -908,6 +922,8 @@ function settingsHTML(){
     <label class="f">${t("cMail")}</label><input type="email" data-c="${i}" data-f="mail" value="${esc(c.mail||"")}"></details>`}).join("");
   return `<div class="two">
    <div><label class="f" for="s-lang">${t("lang")}</label><select id="s-lang">${opt("ja",P.lang,"日本語")}${opt("en",P.lang,"English")}</select></div>
+   <div><label class="f" for="s-lunch">${t("lunchKind")}</label><select id="s-lunch">${(INDEX.lunchKinds||[]).map(k=>opt(k.id,lunchOf(P.role),plain({hira:k.hira,ruby:k.ruby,en:k.en}))).join("")}</select></div>
+   <div><span class="f">${t("sceneShow")}</span><div class="scchk">${allScenesOf(P.role).map(sc=>`<label><input type="checkbox" id="s-sc-${sc.id}" ${hiddenOf(P.role).includes(sc.id)?"":"checked"}> ${esc(plain({hira:sc.hira,ruby:sc.ruby,en:sc.en}))}</label>`).join("")}</div></div>
    <div><label class="f" for="s-klv">${t("kLevel")}</label><select id="s-klv">${["g2","g4","g6","jh","all"].map(k=>opt(k,P.kLevel,t("kLevels")[k])).join("")}</select><button class="btn small" data-act="setupagain" style="margin-top:.3rem">${t("setupAgain")}</button></div>
    <div><label class="f" for="s-script">${t("script")}</label><select id="s-script">${["hira","kanji","ruby"].map(k=>opt(k,P.script,t("scripts")[k])).join("")}</select></div>
    <div><label class="f" for="s-dial">${t("dialLabel")}</label><select id="s-dial">${opt("std",P.dialect,t("dialStd"))}${((DIALIDX&&DIALIDX.regions)||[]).map(r=>opt(r.id,P.dialect,(P.lang==="en"?r.en:r.ja)+"（"+t(r.status==="draft"?"dialDraft":"dialWanted")+"）")).join("")}</select>${dialNote()}<a class="lnk" href="${REQUEST_URL}" target="_blank" rel="noopener noreferrer">${t("dialReq")}</a></div>
@@ -1031,6 +1047,7 @@ document.addEventListener("click",ev=>{
   case "closep": S.panel=null;S.msg="";S.form=false;render();break;
   case "rolepick": S.panel="rolepick";render();break;
   case "dialpick": S.panel="dialpick";render();break;
+  case "lunchkind": P.lunch=P.lunch||{}; P.lunch[P.role]=id; saveProfile(); S.page=0; S.sel=S.sel&&S.sel.free?S.sel:null; render(); break;
   case "wscript": if(id==="hira"){P.script="hira";P.scriptUser=true;P.setupDone=true;S.wiz=null;saveProfile()} else {S.wiz.script="kanji";S.wiz.step=2} render(); break;
   case "wlv": S.wiz.lv=id; S.wiz.step=3; render(); break;
   case "wfuri": P.kLevel=S.wiz.lv; P.script=id==="on"?"ruby":"kanji"; P.scriptUser=true; P.setupDone=true; S.wiz=null; saveProfile(); render(); break;
@@ -1102,6 +1119,8 @@ document.addEventListener("change",ev=>{
   if(id==="s-lang")P.lang=el.value;
   else if(id==="s-script"){P.script=el.value;P.scriptUser=true}
   else if(id==="s-klv")P.kLevel=el.value;
+  else if(id==="s-lunch"){P.lunch=P.lunch||{};P.lunch[P.role]=el.value;S.page=0}
+  else if(id.startsWith("s-sc-")){const sid=id.slice(5);P.hidden=P.hidden||{};let h=[...hiddenOf(P.role)];if(el.checked)h=h.filter(x=>x!==sid);else if(!h.includes(sid))h.push(sid);if(allScenesOf(P.role).every(x=>h.includes(x.id)))h=h.filter(x=>x!==sid);P.hidden[P.role]=h;fixScene();S.page=0}
   else if(id==="s-dial"){P.dialect=el.value; saveProfile(); setDialect(P.dialect).then(()=>render()); return}
   else if(id==="s-dev"){ if(el.value==="auto"){DEV={type:null,auto:true}}else{DEV={type:el.value,auto:false}} saveDev(); S.step="scene" }
   else if(id==="s-size")P.size=el.value;
