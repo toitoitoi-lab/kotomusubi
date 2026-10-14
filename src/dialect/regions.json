@@ -1,0 +1,92 @@
+[
+ {
+  "id": "hokkaido",
+  "ja": "北海道弁",
+  "hira": "ほっかいどうべん",
+  "en": "Hokkaido dialect"
+ },
+ {
+  "id": "tsugaru",
+  "ja": "津軽弁",
+  "hira": "つがるべん",
+  "en": "Tsugaru-ben"
+ },
+ {
+  "id": "nanbu",
+  "ja": "南部弁",
+  "hira": "なんぶべん",
+  "en": "Nanbu-ben"
+ },
+ {
+  "id": "sendai",
+  "ja": "仙台弁",
+  "hira": "せんだいべん",
+  "en": "Sendai-ben"
+ },
+ {
+  "id": "ibaraki",
+  "ja": "茨城弁",
+  "hira": "いばらきべん",
+  "en": "Ibaraki-ben"
+ },
+ {
+  "id": "nagoya",
+  "ja": "名古屋弁",
+  "hira": "なごやべん",
+  "en": "Nagoya-ben"
+ },
+ {
+  "id": "kyoto",
+  "ja": "京ことば",
+  "hira": "きょうことば",
+  "en": "Kyoto-kotoba"
+ },
+ {
+  "id": "osaka",
+  "ja": "大阪弁",
+  "hira": "おおさかべん",
+  "en": "Osaka-ben"
+ },
+ {
+  "id": "banshu",
+  "ja": "播州弁",
+  "hira": "ばんしゅうべん",
+  "en": "Banshu-ben"
+ },
+ {
+  "id": "hiroshima",
+  "ja": "広島弁",
+  "hira": "ひろしまべん",
+  "en": "Hiroshima-ben"
+ },
+ {
+  "id": "tosa",
+  "ja": "土佐弁",
+  "hira": "とさべん",
+  "en": "Tosa-ben"
+ },
+ {
+  "id": "hakata",
+  "ja": "博多弁",
+  "hira": "はかたべん",
+  "en": "Hakata-ben"
+ },
+ {
+  "id": "kumamoto",
+  "ja": "熊本弁",
+  "hira": "くまもとべん",
+  "en": "Kumamoto-ben"
+ },
+ {
+  "id": "kagoshima",
+  "ja": "鹿児島弁",
+  "hira": "かごしまべん",
+  "en": "Kagoshima-ben"
+ },
+ {
+  "id": "okinawa",
+  "ja": "沖縄のことば（うちなーやまとぐち）",
+  "hira": "おきなわの ことば",
+  "en": "Okinawan Japanese (Uchinaa-yamatuguchi)"
+ }
+]
