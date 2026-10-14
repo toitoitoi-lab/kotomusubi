@@ -171,7 +171,7 @@ textarea#buf{resize:vertical}
 
 <script>
 "use strict";
-const VERSION="0.4.0", VARIANT="public";
+const VERSION="0.4.1", VARIANT="public";
 
 /* ---------- 文言（日本語／English） ---------- */
 const T={
@@ -746,7 +746,7 @@ function candHTML(){
   <p class="note" style="margin:.3rem 0 0">${t("levelHelp")} ● ${esc(t("lv")[1])} ／ ●● ${esc(t("lv")[2])} ／ ●●● ${esc(t("lv")[3])}</p>
   <div class="grid" style="margin-top:.5rem">${cur.map((e,k)=>tileHTML(e,start+k,selId===e.id)).join("")}</div>
   <div class="pager"><button class="btn small" data-act="prev" ${S.page<=0?"disabled":""}>◀ ${t("prev")}</button>
-  <span class="pg">${S.page+1} / ${pages}（${list.length}）</span>
+  <span class="pg">${(()=>{const n=list.length,k=list.findIndex(e=>e.id===selId),e2=Math.min(start+pp,n);if(!n)return "0";if(k>=0)return `${k+1} / ${n}`;return start+1===e2?`${e2} / ${n}`:`${start+1}〜${e2} / ${n}`})()}</span>
   <button class="btn small" data-act="next" ${S.page>=pages-1?"disabled":""}>${t("next")} ▶</button></div>`;
 }
 function speakBtn(big){
