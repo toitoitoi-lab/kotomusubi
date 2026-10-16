@@ -2,7 +2,7 @@
 # usage: python3 build_app.py <VERSION> <YYYYMMDD> <dictdir>
 import sys,os,json,shutil
 ver,date,dd=sys.argv[1:4]
-tpl=open('src/app_template.html',encoding='utf-8').read()
+tpl=open('src/app_template.html',encoding='utf-8').read().replace('{{KANJI_LEVELS}}',open('src/kanji_levels.json',encoding='utf-8').read())
 def build(variant):
     out=f'build/{variant}'; shutil.rmtree(out,ignore_errors=True); os.makedirs(out)
     inline=''

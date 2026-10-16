@@ -57,6 +57,38 @@ main.p1{grid-template-columns:1fr;padding:.4rem;padding-bottom:0}
 .pane{background:var(--panel);border:2px solid var(--line);border-radius:.8rem;padding:.6rem;overflow:auto;min-height:0}
 .pane h2{font-size:.8rem;margin:.2rem 0 .3rem;color:var(--sub);font-weight:700}
 .list{display:flex;flex-direction:column;gap:.35rem}
+.rb{display:inline-block;position:relative;padding-top:.62em;line-height:1.25;text-indent:0}
+.rb>.rt{position:absolute;left:50%;top:0;transform:translateX(-50%);font-size:.5em;line-height:1;white-space:nowrap;font-weight:normal;letter-spacing:0}
+.simple{position:fixed;inset:0;display:flex;flex-direction:column;background:var(--bg);z-index:5}
+.sbar{display:flex;align-items:center;gap:.4rem;padding:.3rem .5rem;background:var(--hdr-bg);color:var(--hdr-ink)}
+.sbar .sname{flex:1;text-align:center;font-weight:700;font-size:1rem;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sbtn{border:2px solid var(--hdr-ink);background:transparent;color:var(--hdr-ink);border-radius:.6rem;padding:.25rem .7rem;min-height:44px;font-weight:600;font-size:.95rem}
+.sgrid{flex:1;display:grid;gap:.6rem;padding:.6rem;min-height:0}
+.scell{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.3rem;border:4px solid var(--line);background:var(--tile);border-radius:1.2rem;padding:.4rem;min-height:0;min-width:0;overflow:hidden}
+.scell.empty{background:transparent;border-style:dashed;opacity:.35}
+.scell.ed{border-style:dashed}
+.scell img{flex:1;min-height:0;max-width:100%;object-fit:contain;border-radius:.7rem}
+.scell .sdesc{font-size:clamp(.8rem,2vmin,1.2rem);color:var(--sub);text-align:center;line-height:1.2}
+.scell .sbadge{position:absolute;right:.5rem;top:.4rem;font-size:clamp(1rem,3vmin,1.8rem)}
+label.chk{display:flex;align-items:center;gap:.4rem;min-height:40px;margin-top:.3rem}
+.scell .stx{font-size:clamp(1.3rem,4.2vmin,3rem);font-weight:700;line-height:1.2;text-align:center;overflow-wrap:anywhere}
+.scell.hit{border-color:var(--accent);box-shadow:0 0 0 6px var(--accent)}
+.scell .sdw{position:absolute;left:0;bottom:0;height:10px;width:0;background:var(--focus)}
+.scell.dwelling .sdw{width:100%;transition:width var(--dwell) linear}
+.sprev{display:flex;align-items:center;justify-content:center;min-height:120px;border:2px dashed var(--line);border-radius:.6rem;margin:.3rem 0;padding:.3rem}
+.sprev img{max-width:100%;max-height:220px;border-radius:.5rem}
+.scchk{display:flex;flex-wrap:wrap;gap:.2rem .8rem;font-size:.9rem}
+.scchk label{display:flex;align-items:center;gap:.25rem;min-height:36px}
+.vclip{border:1px solid var(--line);border-radius:.6rem;padding:.4rem .6rem;margin:.4rem 0}
+.vclip .vtx{margin:.3rem 0;font-size:1.1rem}
+.vchk{display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem}
+.vchk .btn{min-height:72px;font-size:1.2rem}
+.wiz{display:flex;flex-direction:column;gap:.6rem}
+.wiz .opt{display:flex;flex-direction:column;align-items:flex-start;gap:.3rem;text-align:left;border:2px solid var(--line);background:var(--tile);border-radius:.8rem;padding:.7rem .9rem;font-size:1.1rem;min-height:56px}
+.wiz .opt[aria-pressed="true"]{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent)}
+.wiz .opt .ex{font-size:1.05rem;color:var(--ink)}
+.wiz .opt .lb{font-weight:700}
+.wiz .steps{font-size:.85rem;color:var(--sub)}
 .rg{font-size:.95rem;margin:.7rem 0 .25rem;color:var(--sub)}
 .hbtn.on{background:var(--hdr-ink);color:var(--hdr-bg)}
 .chips{display:flex;flex-wrap:wrap;gap:.35rem}
@@ -107,14 +139,16 @@ main.p1 ~ .bar,.bar.on{display:flex;gap:.4rem;padding:.4rem;padding-bottom:calc(
 @keyframes flash{50%{background:#ffeb3b;color:#000}}
 @media (prefers-reduced-motion:reduce){.full.attn{animation:none;background:#ffeb3b;color:#000}}
 label.f{display:block;margin:.5rem 0 .15rem;font-weight:700;font-size:.85rem}
-select,input[type=text],input[type=tel],input[type=email],textarea{font:inherit;width:100%;padding:.4rem .5rem;min-height:44px;border:2px solid var(--line);border-radius:.5rem;background:var(--panel);color:var(--ink)}
+select,input[type=text],input[type=url],input[type=tel],input[type=email],textarea{font:inherit;width:100%;padding:.4rem .5rem;min-height:44px;border:2px solid var(--line);border-radius:.5rem;background:var(--panel);color:var(--ink)}
 .two{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.4rem}
 .two>*{min-width:0}
 @media (max-width:480px){.two{grid-template-columns:minmax(0,1fr)}}
 details{margin:.5rem 0;border:1px solid var(--line);border-radius:.6rem;padding:.3rem .6rem}
 summary{cursor:pointer;font-weight:700;min-height:40px;display:flex;align-items:center}
 .tabs{display:flex;gap:.3rem;flex-wrap:wrap;margin-bottom:.5rem}
-.modes{display:flex;gap:.4rem;padding:.3rem .5rem 0}
+.modes{display:flex;gap:.4rem;padding:.3rem .5rem 0;overflow-x:auto;flex-wrap:nowrap}
+.modes .chip{white-space:nowrap;flex:none}
+@media (max-width:480px){.modes .chip{min-height:40px;padding:.2rem .6rem;font-size:.95rem}}
 .board{display:grid;gap:.35rem;margin:.4rem 0}
 .board.rtl{direction:rtl}
 .board.rtl>*{direction:ltr}
@@ -159,7 +193,7 @@ textarea#buf{resize:vertical}
 
 <script>
 "use strict";
-const VERSION="0.3.5", VARIANT="public";
+const VERSION="0.6.0", VARIANT="public";
 
 /* ---------- 文言（日本語／English） ---------- */
 const T={
@@ -183,7 +217,7 @@ ja:{
  vols:["小","中","大"],auto:"自動",contacts:"たすけを よぶ 相手（この端末にだけ 保存）",cName:"名前",cTel:"電話番号",cSms:"SMS の宛先",cMail:"メール",
  data:"書き出し・読み込み",exportJson:"JSON で 書き出す",exportCsv:"CSV で 書き出す",inclContacts:"よぶ相手も 含める",
  importF:"ファイルを 読み込む",replace:"置きかえる",append:"追加する",imported:"読み込みました",importErr:"読み込めませんでした",
- about:"このアプリについて",privacy:"入力した文や登録した内容は、この端末の中だけに 保存されます。外部には 送りません。",
+ vAdded:"ことば帖に 入れました",vTitle:"代弁（だいべん）",vNote:"本人の 気持ちを、支援者が 代わりに ことばに します。つかう まえと あとに、本人に「あってる？」と たしかめて ください。",vType:"うって よみあげる",vTypePh:"本人の 気持ちを ことばに して うつ",vRec:"ろくおん",vStart:"ろくおん はじめ",vStop:"とめる",vSec:"びょう",vRaw:"そのまま",vRobot:"ロボット",vHigh:"たかい こえ",vLow:"ひくい こえ",vTts:"きかいの こえで よむ",vCopy:"うつ らんへ",vStt:"ろくおんと いっしょに 文字に する（おんせい にんしき）",vSttNote:"おんせい にんしきは ブラウザの きのうを つかいます。ブラウザに よっては、こえが インターネットの サーバーに おくられます。",vKeep:"ろくおんは この がめんを とじるまで だけ つかえます。たんまつにも 外にも のこしません。",vNoRec:"この ブラウザでは ろくおん できません。",vMicErr:"マイクが つかえません。ブラウザの せっていで マイクを ゆるして ください。",vCheck:"本人に たしかめる",vYes:"あってる",vSome:"すこし ちがう",vNo:"ちがう",vYesSay:"はい、 そうです",vSomeSay:"すこし ちがいます",vNoSay:"ちがいます",sDesc:"しゃしんの せつめい",sDescPh:"れい：〇〇こうえんの すべりだい",sDescSay:"せつめいも よみあげる",sAct:"おしたときの うごき",sActSpeak:"🔊 よみあげる",sActLink:"🔗 リンクを ひらく",sActMusic:"🎵 おんがくを ながす",sLink:"リンク（URL）",sLinkNote:"おすと、べつの タブで ひらきます。",sAudioFile:"おんがくの ファイルを えらぶ",sAudioSet:"ファイルが はいっています",sAudioDel:"けす",sAudioUrl:"または おんがくの URL",sAudioNote:"もういちど おすと とまります。ファイルは この たんまつの なかだけに ほぞんします（20MB まで）。",sAudioBig:"ファイルが おおきすぎます（20MB まで）",sAudioNone:"おんがくが ありません",sAudioErr:"おんがくを ながせませんでした",sHoldHint:"ながく おして ください",sEmpty:"から",sAdd:"たす",sExit:"もどる",sBoardSet:"ボードの せってい",sEditHelp:"ますを おすと、もじと しゃしんを かえられます。",sCellEdit:"ますの へんしゅう",sText:"もじ（がめんに でる）",sSay:"よみあげる ことば",sSayPh:"からなら うえの もじを よみます",sPhoto:"しゃしん",sNoPhoto:"しゃしんは ありません",sCam:"カメラで とる",sFile:"ファイルから えらぶ",sPhotoDel:"しゃしんを けす",sClear:"この ますを からにする",sBoardName:"ボードの なまえ",sCount:"ますの かず",sDwell:"みつめて えらぶ（たいりゅう）",sSec:"びょう",sOff:"つかわない",sDwellHelp:"しせん にゅうりょく そうちや マウスを ますの うえで とめると、きめた じかんで よみあげます。",sBoardAdd:"ボードを ふやす",sBoardDel:"この ボードを けす",sShoot:"とる",sCamNote:"えいぞうは この たんまつの なかだけで つかいます。",sCamErr:"カメラが つかえません。ファイルから えらんで ください。",sImgErr:"しゃしんを よみこめませんでした。",lunchKind:"昼ごはんの かたち",sceneShow:"出す ばめん",kLevel:"かんじの はんい",kLevels:{g2:"小学校1・2年まで",g4:"小学校3・4年まで",g6:"小学校5・6年まで",jh:"中学校以上（常用漢字）",all:"高校以上（すべて）"},setupAgain:"はじめの せっていを やりなおす",about:"このアプリについて",privacy:"入力した文や登録した内容は、この端末の中だけに 保存されます。外部には 送りません。",
  heavyNote:"大切な ひょうげんです。ボタンを ながおしして ください。",
  newBook:"新しい帖",bookName:"帖の名前",rename:"名前を かえる",delBook:"帖を けす",edit:"へんしゅう",done:"おわり",
  addPhrase:"ことばを 足す",phText:"ことば（漢字[よみ] でも 可）",phYomi:"よみ（空なら そのまま）",phEn:"English（あれば）",save:"ほぞん",
@@ -221,7 +255,7 @@ en:{
  vols:["Low","Mid","High"],auto:"Auto",contacts:"People to call for help (stored on this device only)",cName:"Name",cTel:"Phone",cSms:"SMS number",cMail:"Email",
  data:"Export / Import",exportJson:"Export as JSON",exportCsv:"Export as CSV",inclContacts:"Include help contacts",
  importF:"Import a file",replace:"Replace",append:"Append",imported:"Imported",importErr:"Could not import",
- about:"About",privacy:"Everything you type or register stays on this device. Nothing is sent out.",
+ vAdded:"Added to the phrasebook.",vTitle:"Voice for me (supporter)",vNote:"A supporter puts the person's feelings into words. Before and after, check with the person: is this right?",vType:"Type and speak",vTypePh:"Type the person's feelings",vRec:"Record",vStart:"Start recording",vStop:"Stop",vSec:" s",vRaw:"As is",vRobot:"Robot",vHigh:"Higher",vLow:"Lower",vTts:"Read with device voice",vCopy:"To text box",vStt:"Transcribe while recording (speech recognition)",vSttNote:"Speech recognition uses the browser's feature. Some browsers send audio to an internet server.",vKeep:"Recordings last only until you leave this screen. Nothing is saved or sent.",vNoRec:"This browser cannot record.",vMicErr:"Microphone unavailable. Please allow it in browser settings.",vCheck:"Check with the person",vYes:"Right",vSome:"A bit different",vNo:"Not right",vYesSay:"Yes, that is right.",vSomeSay:"It is a little different.",vNoSay:"No, that is not right.",sDesc:"Photo caption",sDescPh:"e.g. The slide at the park",sDescSay:"Speak the caption too",sAct:"When pressed",sActSpeak:"🔊 Speak",sActLink:"🔗 Open link",sActMusic:"🎵 Play music",sLink:"Link (URL)",sLinkNote:"Opens in a new tab.",sAudioFile:"Choose a music file",sAudioSet:"A file is set",sAudioDel:"Remove",sAudioUrl:"Or a music URL",sAudioNote:"Press again to stop. Files stay on this device only (up to 20 MB).",sAudioBig:"The file is too large (max 20 MB).",sAudioNone:"No music set.",sAudioErr:"Could not play the music.",sHoldHint:"Press and hold",sEmpty:"empty",sAdd:"add",sExit:"Back",sBoardSet:"Board settings",sEditHelp:"Tap a cell to change its text and photo.",sCellEdit:"Edit cell",sText:"Text (shown)",sSay:"Words to speak",sSayPh:"If empty, the text above is spoken",sPhoto:"Photo",sNoPhoto:"No photo",sCam:"Take a photo",sFile:"Choose a file",sPhotoDel:"Remove photo",sClear:"Clear this cell",sBoardName:"Board name",sCount:"Number of cells",sDwell:"Dwell to select",sSec:" s",sOff:"Off",sDwellHelp:"Rest an eye-tracker or mouse pointer on a cell; it speaks after the chosen time.",sBoardAdd:"Add board",sBoardDel:"Delete this board",sShoot:"Shoot",sCamNote:"Video stays on this device.",sCamErr:"Camera unavailable. Please choose a file.",sImgErr:"Could not read the photo.",lunchKind:"Lunch type",sceneShow:"Scenes to show",kLevel:"Kanji range",kLevels:{g2:"Grade 1–2",g4:"Grade 3–4",g6:"Grade 5–6",jh:"Junior high+ (Joyo)",all:"High school+ (all)"},setupAgain:"Redo first-time setup",about:"About",privacy:"Everything you type or register stays on this device. Nothing is sent out.",
  heavyNote:"This is an important expression. Press and hold the button.",
  newBook:"New book",bookName:"Book name",rename:"Rename",delBook:"Delete book",edit:"Edit",done:"Done",
  addPhrase:"Add phrase",phText:"Text (kanji[reading] allowed)",phYomi:"Reading (blank = as typed)",phEn:"English (optional)",save:"Save",
@@ -246,7 +280,7 @@ const store={
  get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return k in mem?mem[k]:d}},
  set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){mem[k]=v}}
 };
-const DEF_PROFILE={lang:"ja",script:"ruby",scriptUser:false,size:"L",theme:"normal",icons:true,confirm:true,rate:0.9,perPage:"auto",volume:1,role:"highschool",compose:"both",predict:5,kana:"auto",voiceJa:"",voiceEn:"",inputKind:"hira",abcLayout:"abc",dialect:"std"};
+const DEF_PROFILE={lang:"ja",script:"ruby",scriptUser:false,size:"L",theme:"normal",icons:true,confirm:true,rate:0.9,perPage:"auto",volume:1,role:"highschool",compose:"both",predict:5,kana:"auto",voiceJa:"",voiceEn:"",inputKind:"hira",abcLayout:"abc",dialect:"std",kLevel:"all",setupDone:false,lunch:{},hidden:{}};
 let P=Object.assign({},DEF_PROFILE,store.get("km.profile",{}));
 if(!P.scriptUser&&P.script==="hira") P.script="ruby";
 let DEV=store.get("km.device",{type:null,auto:true});
@@ -265,20 +299,27 @@ const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&
 const KANJI=/([一-鿿々〆ヶ]+)\[([^\]]+)\]/g;
 const stripRuby=s=>String(s).replace(/\[[^\]]*\]/g,"");
 const readingOf=s=>String(s).replace(KANJI,"$2").replace(/\[[^\]]*\]/g,"");
-const rubyHTML=s=>esc(s).replace(KANJI,"<ruby>$1<rt>$2</rt></ruby>").replace(/\[[^\]]*\]/g,"");
+const rubyHTML=s=>esc(s).replace(KANJI,'<span class="rb">$1<span class="rt">$2</span></span>').replace(/\[[^\]]*\]/g,"");
+/* 漢字の学年（学年別漢字配当表 2017 告示・常用漢字） */
+const KLV={"g": ["一右雨円王音下火花貝学気九休玉金空月犬見五口校左三山子四糸字耳七車手十出女小上森人水正生青夕石赤千川先早草足村大男竹中虫町天田土二日入年白八百文木本名目立力林六", "引羽雲園遠何科夏家歌画回会海絵外角楽活間丸岩顔汽記帰弓牛魚京強教近兄形計元言原戸古午後語工公広交光考行高黄合谷国黒今才細作算止市矢姉思紙寺自時室社弱首秋週春書少場色食心新親図数西声星晴切雪船線前組走多太体台地池知茶昼長鳥朝直通弟店点電刀冬当東答頭同道読内南肉馬売買麦半番父風分聞米歩母方北毎妹万明鳴毛門夜野友用曜来里理話", "悪安暗医委意育員院飲運泳駅央横屋温化荷界開階寒感漢館岸起期客究急級宮球去橋業曲局銀区苦具君係軽血決研県庫湖向幸港号根祭皿仕死使始指歯詩次事持式実写者主守取酒受州拾終習集住重宿所暑助昭消商章勝乗植申身神真深進世整昔全相送想息速族他打対待代第題炭短談着注柱丁帳調追定庭笛鉄転都度投豆島湯登等動童農波配倍箱畑発反坂板皮悲美鼻筆氷表秒病品負部服福物平返勉放味命面問役薬由油有遊予羊洋葉陽様落流旅両緑礼列練路和", "愛案以衣位茨印英栄媛塩岡億加果貨課芽賀改械害街各覚潟完官管関観願岐希季旗器機議求泣給挙漁共協鏡競極熊訓軍郡群径景芸欠結建健験固功好香候康佐差菜最埼材崎昨札刷察参産散残氏司試児治滋辞鹿失借種周祝順初松笑唱焼照城縄臣信井成省清静席積折節説浅戦選然争倉巣束側続卒孫帯隊達単置仲沖兆低底的典伝徒努灯働特徳栃奈梨熱念敗梅博阪飯飛必票標不夫付府阜富副兵別辺変便包法望牧末満未民無約勇要養浴利陸良料量輪類令冷例連老労録", "圧囲移因永営衛易益液演応往桜可仮価河過快解格確額刊幹慣眼紀基寄規喜技義逆久旧救居許境均禁句型経潔件険検限現減故個護効厚耕航鉱構興講告混査再災妻採際在財罪殺雑酸賛士支史志枝師資飼示似識質舎謝授修述術準序招証象賞条状常情織職制性政勢精製税責績接設絶祖素総造像増則測属率損貸態団断築貯張停提程適統堂銅導得毒独任燃能破犯判版比肥非費備評貧布婦武復複仏粉編弁保墓報豊防貿暴脈務夢迷綿輸余容略留領歴", "胃異遺域宇映延沿恩我灰拡革閣割株干巻看簡危机揮貴疑吸供胸郷勤筋系敬警劇激穴券絹権憲源厳己呼誤后孝皇紅降鋼刻穀骨困砂座済裁策冊蚕至私姿視詞誌磁射捨尺若樹収宗就衆従縦縮熟純処署諸除承将傷障蒸針仁垂推寸盛聖誠舌宣専泉洗染銭善奏窓創装層操蔵臓存尊退宅担探誕段暖値宙忠著庁頂腸潮賃痛敵展討党糖届難乳認納脳派拝背肺俳班晩否批秘俵腹奮並陛閉片補暮宝訪亡忘棒枚幕密盟模訳郵優預幼欲翌乱卵覧裏律臨朗論"], "j": "亜哀挨愛曖悪握圧扱宛嵐安案暗以衣位囲医依委威為畏胃尉異移萎偉椅彙意違維慰遺緯域育一壱逸茨芋引印因咽姻員院淫陰飲隠韻右宇羽雨唄鬱畝浦運雲永泳英映栄営詠影鋭衛易疫益液駅悦越謁閲円延沿炎怨宴媛援園煙猿遠鉛塩演縁艶汚王凹央応往押旺欧殴桜翁奥横岡屋億憶臆虞乙俺卸音恩温穏下化火加可仮何花佳価果河苛科架夏家荷華菓貨渦過嫁暇禍靴寡歌箇稼課蚊牙瓦我画芽賀雅餓介回灰会快戒改怪拐悔海界皆械絵開階塊楷解潰壊懐諧貝外劾害崖涯街慨蓋該概骸垣柿各角拡革格核殻郭覚較隔閣確獲嚇穫学岳楽額顎掛潟括活喝渇割葛滑褐轄且株釜鎌刈干刊甘汗缶完肝官冠巻看陥乾勘患貫寒喚堪換敢棺款間閑勧寛幹感漢慣管関歓監緩憾還館環簡観韓艦鑑丸含岸岩玩眼頑顔願企伎危机気岐希忌汽奇祈季紀軌既記起飢鬼帰基寄規亀喜幾揮期棋貴棄毀旗器畿輝機騎技宜偽欺義疑儀戯擬犠議菊吉喫詰却客脚逆虐九久及弓丘旧休吸朽臼求究泣急級糾宮救球給嗅窮牛去巨居拒拠挙虚許距魚御漁凶共叫狂京享供協況峡挟狭恐恭胸脅強教郷境橋矯鏡競響驚仰暁業凝曲局極玉巾斤均近金菌勤琴筋僅禁緊錦謹襟吟銀区句苦駆具惧愚空偶遇隅串屈掘窟熊繰君訓勲薫軍郡群兄刑形系径茎係型契計恵啓掲渓経蛍敬景軽傾携継詣慶憬稽憩警鶏芸迎鯨隙劇撃激桁欠穴血決結傑潔月犬件見券肩建研県倹兼剣拳軒健険圏堅検嫌献絹遣権憲賢謙鍵繭顕験懸元幻玄言弦限原現舷減源厳己戸古呼固股虎孤弧故枯個庫湖雇誇鼓錮顧五互午呉後娯悟碁語誤護口工公勾孔功巧広甲交光向后好江考行坑孝抗攻更効幸拘肯侯厚恒洪皇紅荒郊香候校耕航貢降高康控梗黄喉慌港硬絞項溝鉱構綱酵稿興衡鋼講購乞号合拷剛傲豪克告谷刻国黒穀酷獄骨駒込頃今困昆恨根婚混痕紺魂墾懇左佐沙査砂唆差詐鎖座挫才再災妻采砕宰栽彩採済祭斎細菜最裁債催塞歳載際埼在材剤財罪崎作削昨柵索策酢搾錯咲冊札刷刹拶殺察撮擦雑皿三山参桟蚕惨産傘散算酸賛残斬暫士子支止氏仕史司四市矢旨死糸至伺志私使刺始姉枝祉肢姿思指施師恣紙脂視紫詞歯嗣試詩資飼誌雌摯賜諮示字寺次耳自似児事侍治持時滋慈辞磁餌璽鹿式識軸七𠮟失室疾執湿嫉漆質実芝写社車舎者射捨赦斜煮遮謝邪蛇尺借酌釈爵若弱寂手主守朱取狩首殊珠酒腫種趣寿受呪授需儒樹収囚州舟秀周宗拾秋臭修袖終羞習週就衆集愁酬醜蹴襲十汁充住柔重従渋銃獣縦叔祝宿淑粛縮塾熟出述術俊春瞬旬巡盾准殉純循順準潤遵処初所書庶暑署緒諸女如助序叙徐除小升少召匠床抄肖尚招承昇松沼昭宵将消症祥称笑唱商渉章紹訟勝掌晶焼焦硝粧詔証象傷奨照詳彰障憧衝賞償礁鐘上丈冗条状乗城浄剰常情場畳蒸縄壌嬢錠譲醸色拭食植殖飾触嘱織職辱尻心申伸臣芯身辛侵信津神唇娠振浸真針深紳進森診寝慎新審震薪親人刃仁尽迅甚陣尋腎須図水吹垂炊帥粋衰推酔遂睡穂随髄枢崇数据杉裾寸瀬是井世正生成西声制姓征性青斉政星牲省凄逝清盛婿晴勢聖誠精製誓静請整醒税夕斥石赤昔析席脊隻惜戚責跡積績籍切折拙窃接設雪摂節説舌絶千川仙占先宣専泉浅洗染扇栓旋船戦煎羨腺詮践箋銭潜線遷選薦繊鮮全前善然禅漸膳繕狙阻祖租素措粗組疎訴塑遡礎双壮早争走奏相荘草送倉捜挿桑巣掃曹曽爽窓創喪痩葬装僧想層総遭槽踪操燥霜騒藻造像増憎蔵贈臓即束足促則息捉速側測俗族属賊続卒率存村孫尊損遜他多汰打妥唾堕惰駄太対体耐待怠胎退帯泰堆袋逮替貸隊滞態戴大代台第題滝宅択沢卓拓託濯諾濁但達脱奪棚誰丹旦担単炭胆探淡短嘆端綻誕鍛団男段断弾暖談壇地池知値恥致遅痴稚置緻竹畜逐蓄築秩窒茶着嫡中仲虫沖宙忠抽注昼柱衷酎鋳駐著貯丁弔庁兆町長挑帳張彫眺釣頂鳥朝貼超腸跳徴嘲潮澄調聴懲直勅捗沈珍朕陳賃鎮追椎墜通痛塚漬坪爪鶴低呈廷弟定底抵邸亭貞帝訂庭逓停偵堤提程艇締諦泥的笛摘滴適敵溺迭哲鉄徹撤天典店点展添転塡田伝殿電斗吐妬徒途都渡塗賭土奴努度怒刀冬灯当投豆東到逃倒凍唐島桃討透党悼盗陶塔搭棟湯痘登答等筒統稲踏糖頭謄藤闘騰同洞胴動堂童道働銅導瞳峠匿特得督徳篤毒独読栃凸突届屯豚頓貪鈍曇丼那奈内梨謎鍋南軟難二尼弐匂肉虹日入乳尿任妊忍認寧熱年念捻粘燃悩納能脳農濃把波派破覇馬婆罵拝杯背肺俳配排敗廃輩売倍梅培陪媒買賠白伯拍泊迫剝舶博薄麦漠縛爆箱箸畑肌八鉢発髪伐抜罰閥反半氾犯帆汎伴判坂阪板版班畔般販斑飯搬煩頒範繁藩晩番蛮盤比皮妃否批彼披肥非卑飛疲秘被悲扉費碑罷避尾眉美備微鼻膝肘匹必泌筆姫百氷表俵票評漂標苗秒病描猫品浜貧賓頻敏瓶不夫父付布扶府怖阜附訃負赴浮婦符富普腐敷膚賦譜侮武部舞封風伏服副幅復福腹複覆払沸仏物粉紛雰噴墳憤奮分文聞丙平兵併並柄陛閉塀幣弊蔽餅米壁璧癖別蔑片辺返変偏遍編弁便勉歩保哺捕補舗母募墓慕暮簿方包芳邦奉宝抱放法泡胞俸倣峰砲崩訪報蜂豊飽褒縫亡乏忙坊妨忘防房肪某冒剖紡望傍帽棒貿貌暴膨謀頰北木朴牧睦僕墨撲没勃堀本奔翻凡盆麻摩磨魔毎妹枚昧埋幕膜枕又末抹万満慢漫未味魅岬密蜜脈妙民眠矛務無夢霧娘名命明迷冥盟銘鳴滅免面綿麺茂模毛妄盲耗猛網目黙門紋問冶夜野弥厄役約訳薬躍闇由油喩愉諭輸癒唯友有勇幽悠郵湧猶裕遊雄誘憂融優与予余誉預幼用羊妖洋要容庸揚揺葉陽溶腰様瘍踊窯養擁謡曜抑沃浴欲翌翼拉裸羅来雷頼絡落酪辣乱卵覧濫藍欄吏利里理痢裏履璃離陸立律慄略柳流留竜粒隆硫侶旅虜慮了両良料涼猟陵量僚領寮療瞭糧力緑林厘倫輪隣臨瑠涙累塁類令礼冷励戻例鈴零霊隷齢麗暦歴列劣烈裂恋連廉練錬呂炉賂路露老労弄郎朗浪廊楼漏籠六録麓論和話賄脇惑枠湾腕"};
+const KSET=(()=>{const m={};KLV.g.forEach((g,i)=>{for(const c of g)m[c]=i+1});for(const c of KLV.j) if(!m[c]) m[c]=7;return m})();
+const KMAX={g2:2,g4:4,g6:6,jh:7,all:99};
+const kanjiOK=c=>{const g=KSET[c]||(/[々〆ヶ]/.test(c)?1:8); return g<=(KMAX[P.kLevel]||99)};
+/* 学年より上の字を含む熟語は、熟語ごとかなにする */
+const lvRuby=s=>String(s).replace(KANJI,(m,b,r)=>[...b].every(kanjiOK)?m:r);
 const uid=()=>Math.random().toString(36).slice(2,9);
 const today=()=>new Date().toISOString().slice(0,10);
 /* 表示：obj は {hira, ruby, en} */
 function disp(o){
   if(P.lang==="en") return esc(o.en||stripRuby(o.ruby||o.hira));
   if(P.script==="hira") return esc(o.hira);
-  if(P.script==="kanji") return esc(stripRuby(o.ruby));
-  return rubyHTML(o.ruby);
+  if(P.script==="kanji") return esc(stripRuby(lvRuby(o.ruby)));
+  return rubyHTML(lvRuby(o.ruby));
 }
 function plain(o){
   if(P.lang==="en") return o.en||stripRuby(o.ruby||o.hira);
   if(P.script==="hira") return o.hira;
-  return stripRuby(o.ruby);
+  return stripRuby(lvRuby(o.ruby));
 }
 function speakText(o){return P.lang==="en"?(o.en||""):(o.ascii?o.en:o.hira)}
 const say=m=>{const l=document.getElementById("live");if(l){l.textContent="";setTimeout(()=>l.textContent=m,30)}};
@@ -321,7 +362,7 @@ const REQUEST_URL="https://github.com/toitoitoi-lab/kotomusubi/issues/new";
 const normStd=h=>h.replace(/[\s、。，．！？!?]/g,"");
 function hydrate(id){
   return RAW[id].map(r=>{
-    const o={id:r[0],scene:r[1],intent:r[2],level:r[3],hira:r[4],ruby:r[5],en:r[6],icon:r[7],role:id};
+    const o={id:r[0],scene:r[1],intent:r[2],level:r[3],hira:r[4],ruby:r[5],en:r[6],icon:r[7],sub:r[8]||"",role:id};
     if((DIAL.map||DIAL.rules)&&!isHeavy(o)){
       let d=DIAL.map&&DIAL.map.get(normStd(r[4]));
       if(!d&&DIAL.rules){let t=r[4]; for(const [re,rp] of DIAL.rules) t=t.replace(re,rp); if(t!==r[4]) d=t}
@@ -352,7 +393,16 @@ async function setDialect(id){
   if(S.sel&&!S.sel.free) S.sel=null;
 }
 const roleObj=id=>INDEX.roles.find(r=>r.id===id);
-const scenesOf=id=>INDEX.scenes.filter(s=>s.role===id);
+const allScenesOf=id=>INDEX.scenes.filter(s=>s.role===id);
+const lunchOf=role=>(P.lunch&&P.lunch[role])||(INDEX.lunchDefault||{})[role]||"bento";
+const lunchKind=role=>(INDEX.lunchKinds||[]).find(k=>k.id===lunchOf(role));
+const hiddenOf=role=>(P.hidden&&P.hidden[role])||(INDEX.hiddenDefault||{})[role]||[];
+const okSub=e=>!e.sub||e.sub===lunchOf(e.role);
+const scenesOf=id=>allScenesOf(id).filter(s=>!hiddenOf(id).includes(s.id)).map(s=>{
+  if(s.id!=="lunch") return s; const k=lunchKind(id); if(!k) return s;
+  return {...s,hira:s.hira+"（"+k.hira+"）",ruby:s.ruby+"（"+k.ruby+"）",kanji:s.kanji+"（"+k.kanji+"）",en:s.en+" ("+k.en+")"};
+});
+function fixScene(){const sc=scenesOf(P.role); if(!sc.find(x=>x.id===S.scene)) S.scene=sc[0]&&sc[0].id}
 const label=o=>disp({hira:o.hira,ruby:o.ruby,en:o.en});
 const isHeavy=e=>e&&((e.intent==="trouble"&&e.level===3)||(e.role==="counsel"&&(e.level===3||e.intent==="trouble"||e.intent==="feeling")));
 
@@ -468,6 +518,176 @@ function holdStart(btn,ms,fn){
 }
 function holdCancel(btn){clearTimeout(holdTimer);holdTimer=null;btn&&btn.classList.remove("holding")}
 
+
+/* ---------- かんたんボード（4／6 の大きなボタン。写真と文字を自由に設定） ---------- */
+const IDB={db:null,mem:{},
+  open(){ if(this.db||!window.indexedDB) return Promise.resolve(this.db);
+    return new Promise(res=>{try{const r=indexedDB.open("kotomusubi",1);r.onupgradeneeded=()=>r.result.createObjectStore("img");r.onsuccess=()=>{this.db=r.result;res(this.db)};r.onerror=()=>res(null)}catch(e){res(null)}})},
+  async get(k){const db=await this.open(); if(!db) return this.mem[k]; return new Promise(res=>{try{const q=db.transaction("img").objectStore("img").get(k);q.onsuccess=()=>res(q.result);q.onerror=()=>res(null)}catch(e){res(this.mem[k])}})},
+  async put(k,v){this.mem[k]=v; const db=await this.open(); if(!db) return; return new Promise(res=>{try{const t=db.transaction("img","readwrite");t.objectStore("img").put(v,k);t.oncomplete=res;t.onerror=res}catch(e){res()}})},
+  async del(k){delete this.mem[k]; const db=await this.open(); if(!db) return; try{db.transaction("img","readwrite").objectStore("img").delete(k)}catch(e){}}
+};
+const IMG={}; // 表示用の写真（キー→dataURL）
+const MAXC=12, CELL0=()=>({text:"",say:"",img:"",desc:"",descSay:false,act:"speak",link:"",audio:"",audioName:"",audioUrl:""});
+const blankCells=()=>Array.from({length:MAXC},CELL0);
+const NCHOICES=[1,2,3,4,6,8,9,12];
+const GRID={1:[1,1],2:[2,1],3:[3,1],4:[2,2],6:[3,2],8:[4,2],9:[3,3],12:[4,3]};
+let SIMPLE=store.get("km.simple",null);
+if(!SIMPLE||!SIMPLE.boards){SIMPLE={cur:0,dwell:0,boards:[{id:uid(),name:"ボード 1",n:4,cells:blankCells()}]}}
+SIMPLE.boards.forEach(b=>{b.cells=b.cells.map(c=>Object.assign(CELL0(),c)); while(b.cells.length<MAXC) b.cells.push(CELL0()); if(!GRID[b.n]) b.n=4});
+const saveSimple=()=>store.set("km.simple",SIMPLE);
+const curBoard=()=>SIMPLE.boards[Math.min(SIMPLE.cur,SIMPLE.boards.length-1)]||SIMPLE.boards[0];
+async function loadBoardImgs(){const b=curBoard(); let ch=false; for(const c of b.cells){ if(c.img&&!IMG[c.img]){const v=await IDB.get(c.img); if(v){IMG[c.img]=v;ch=true}} } if(ch) render()}
+function simpleHTML(){
+  const b=curBoard(), ed=S.sEdit, n=b.n, nb=SIMPLE.boards.length;
+  const cells=b.cells.slice(0,n).map((c,i)=>{
+    const has=c.text||c.img||(c.act==="link"&&c.link)||(c.act==="music"&&(c.audio||c.audioUrl));
+    if(!has&&!ed) return `<div class="scell empty" aria-hidden="true"></div>`;
+    const im=c.img&&IMG[c.img]?`<img src="${IMG[c.img]}" alt="${esc(c.desc)}">`:"";
+    const ds=c.img&&c.desc?`<span class="sdesc">${esc(c.desc)}</span>`:"";
+    const bd=c.act==="link"&&c.link?`<span class="sbadge" aria-hidden="true">🔗</span>`:c.act==="music"&&(c.audio||c.audioUrl)?`<span class="sbadge" aria-hidden="true">${S.sPlay===i?"■":"🎵"}</span>`:"";
+    return `<button class="scell ${S.sHit===i||S.sPlay===i?"hit":""} ${ed?"ed":""}" data-act="${ed?"sedit":"scell"}" data-i="${i}" data-key="sc${i}" aria-label="${esc(c.text||c.desc||t("sEmpty"))}">${bd}${im}${ds}<span class="stx">${esc(c.text)||(ed?"＋ "+t("sAdd"):"")}</span><span class="sdw"></span></button>`;
+  }).join("");
+  const nav=S.sHint?`<span class="sname" role="status">${esc(S.sHint)}</span>`:nb>1?`<button class="sbtn" data-act="sboard" data-id="-1" aria-label="${t("prev")}">◀</button><span class="sname">${esc(b.name)}（${SIMPLE.cur+1}/${nb}）</span><button class="sbtn" data-act="sboard" data-id="1" aria-label="${t("next")}">▶</button>`:`<span class="sname">${esc(b.name)}</span>`;
+  const top=ed?`<div class="sbar"><button class="sbtn" data-act="sdone">✔ ${t("done")}</button>${nav}<button class="sbtn" data-act="sbset">⚙ ${t("sBoardSet")}</button></div><p class="note" style="margin:.2rem .6rem">${t("sEditHelp")}</p>`
+    :`<div class="sbar"><button class="sbtn hold" data-act="sexit" aria-label="${t("sExit")}">◀ ${t("sExit")}</button>${nav}<button class="sbtn hold" data-act="sedithold">✎ ${t("edit")}</button></div>`;
+  const g=GRID[n]||[2,2], port=matchMedia("(orientation:portrait)").matches, cols=port?g[1]:g[0], rows=port?g[0]:g[1];
+  return `<div class="simple" style="--dwell:${SIMPLE.dwell||1}ms">${top}<div class="sgrid" style="grid-template-columns:repeat(${cols},1fr);grid-template-rows:repeat(${rows},1fr)">${cells}</div></div>`;
+}
+function scellSheet(){
+  const i=S.sCell, d=S.sDraft||(S.sDraft=Object.assign(CELL0(),curBoard().cells[i])); const im=d.img&&IMG[d.img];
+  const touch=matchMedia("(pointer:coarse)").matches;
+  const acts=[["speak","sActSpeak"],["link","sActLink"],["music","sActMusic"]];
+  return sheet(t("sCellEdit")+"（"+(i+1)+"）",`
+   <label class="f" for="sc-text">${t("sText")}</label><input type="text" id="sc-text" value="${esc(d.text)}" maxlength="40">
+   <label class="f">${t("sPhoto")}</label>
+   <div class="sprev">${im?`<img src="${im}" alt="">`:`<span class="note">${t("sNoPhoto")}</span>`}</div>
+   <div class="row">
+    ${touch?`<label class="btn" for="sc-cam">📷 ${t("sCam")}</label>`:`<button class="btn" data-act="scamopen">📷 ${t("sCam")}</button>`}
+    <label class="btn" for="sc-file">🖼 ${t("sFile")}</label>
+    ${im?`<button class="btn" data-act="simgdel">${t("sPhotoDel")}</button>`:""}
+   </div>
+   <input type="file" id="sc-cam" accept="image/*" capture="environment" hidden>
+   <input type="file" id="sc-file" accept="image/*" hidden>
+   ${im?`<label class="f" for="sc-desc">${t("sDesc")}</label><input type="text" id="sc-desc" value="${esc(d.desc)}" maxlength="60" placeholder="${t("sDescPh")}">
+   <label class="chk"><input type="checkbox" id="sc-descsay" ${d.descSay?"checked":""}> ${t("sDescSay")}</label>`:""}
+   <label class="f">${t("sAct")}</label>
+   <div class="chips">${acts.map(([k,l])=>`<button class="chip" data-act="sact" data-id="${k}" aria-pressed="${d.act===k}">${t(l)}</button>`).join("")}</div>
+   ${d.act==="speak"?`<label class="f" for="sc-say">${t("sSay")}</label><input type="text" id="sc-say" value="${esc(d.say)}" maxlength="80" placeholder="${t("sSayPh")}">`:""}
+   ${d.act==="link"?`<label class="f" for="sc-link">${t("sLink")}</label><input type="url" id="sc-link" value="${esc(d.link)}" placeholder="https://" inputmode="url"><p class="note">${t("sLinkNote")}</p>`:""}
+   ${d.act==="music"?`<div class="row"><label class="btn" for="sc-audio">🎵 ${t("sAudioFile")}</label>${d.audio?`<span class="note">${esc(d.audioName||t("sAudioSet"))}</span><button class="btn small" data-act="saudiodel">${t("sAudioDel")}</button>`:""}</div>
+   <input type="file" id="sc-audio" accept="audio/*" hidden>
+   <label class="f" for="sc-aurl">${t("sAudioUrl")}</label><input type="url" id="sc-aurl" value="${esc(d.audioUrl)}" placeholder="https://…mp3" inputmode="url">
+   <p class="note">${t("sAudioNote")}</p>`:""}
+   <div class="row" style="margin-top:.6rem"><button class="btn pri" data-act="scellsave">${t("save")}</button><button class="btn" data-act="scellclear">${t("sClear")}</button></div>`);
+}
+function sboardSheet(){
+  const b=curBoard();
+  return sheet(t("sBoardSet"),`
+   <label class="f" for="sb-name">${t("sBoardName")}</label><input type="text" id="sb-name" value="${esc(b.name)}" maxlength="20">
+   <label class="f">${t("sCount")}</label><div class="chips">${NCHOICES.map(k=>`<button class="chip" data-act="sbn" data-id="${k}" aria-pressed="${b.n===k}">${k}</button>`).join("")}</div>
+   <label class="f">${t("sDwell")}</label><div class="chips">${[0,1000,1500,2000,3000].map(k=>`<button class="chip" data-act="sdw" data-id="${k}" aria-pressed="${(SIMPLE.dwell||0)===k}">${k?(k/1000)+t("sSec"):t("sOff")}</button>`).join("")}</div>
+   <p class="note">${t("sDwellHelp")}</p>
+   <div class="row" style="margin-top:.6rem"><button class="btn pri" data-act="sbsave">${t("save")}</button><button class="btn" data-act="sbadd">＋ ${t("sBoardAdd")}</button>${SIMPLE.boards.length>1?`<button class="btn" data-act="sbdel">${t("sBoardDel")}</button>`:""}</div>`);
+}
+function scamSheet(){
+  return sheet(t("sCam"),`<video id="sc-video" autoplay playsinline muted style="width:100%;max-height:60vh;background:#000;border-radius:.6rem"></video>
+   <div class="row" style="margin-top:.6rem"><button class="btn pri" data-act="scamshot">📸 ${t("sShoot")}</button><button class="btn" data-act="scamclose">${t("close")}</button></div>
+   <p class="note">${t("sCamNote")}</p>`);
+}
+let camStream=null;
+async function camOpen(){
+  S.panel="scam"; render();
+  try{ camStream=await navigator.mediaDevices.getUserMedia({video:{width:{ideal:1280},height:{ideal:720}},audio:false});
+    const v=document.getElementById("sc-video"); if(v) v.srcObject=camStream }
+  catch(e){ camStop(); S.panel="scell"; render(); const f=document.getElementById("sc-file"); say(t("sCamErr")); f&&f.click() }
+}
+function camStop(){ if(camStream){camStream.getTracks().forEach(x=>x.stop()); camStream=null} }
+function shrink(src,max=640){ return new Promise((res,rej)=>{const im=new Image(); im.onload=()=>{const k=Math.min(1,max/Math.max(im.width,im.height)); const c=document.createElement("canvas"); c.width=Math.round(im.width*k); c.height=Math.round(im.height*k); c.getContext("2d").drawImage(im,0,0,c.width,c.height); res(c.toDataURL("image/jpeg",0.82))}; im.onerror=rej; im.src=src}) }
+async function setCellImg(dataUrl){
+  const d=S.sDraft; if(!d) return; const k="img_"+uid();
+  const v=await shrink(dataUrl); IMG[k]=v; await IDB.put(k,v);
+  if(d.img&&d.img!==curBoard().cells[S.sCell].img){IDB.del(d.img);delete IMG[d.img]}
+  d.img=k; S.panel="scell"; render();
+}
+async function setCellAudio(file){
+  const d=S.sDraft; if(!d||!file) return;
+  if(file.size>20*1024*1024){say(t("sAudioBig"));return}
+  const k="aud_"+uid(); await IDB.put(k,file);
+  if(d.audio&&d.audio!==curBoard().cells[S.sCell].audio) IDB.del(d.audio);
+  d.audio=k; d.audioName=file.name; render();
+}
+function discardDraft(){ const d=S.sDraft, c=curBoard().cells[S.sCell]; if(d&&c){ if(d.img&&d.img!==c.img){IDB.del(d.img);delete IMG[d.img]} if(d.audio&&d.audio!==c.audio) IDB.del(d.audio) } S.sDraft=null }
+let AUDIO=null;
+function stopMusic(){ if(AUDIO){try{AUDIO.pause()}catch(e){} if(AUDIO.__url) URL.revokeObjectURL(AUDIO.__url); AUDIO=null} if(S.sPlay!=null){S.sPlay=null; render()} }
+async function playMusic(i,c){
+  if(S.sPlay===i){stopMusic();return}
+  stopMusic(); let src=c.audioUrl, url=null;
+  if(c.audio){const blob=await IDB.get(c.audio); if(blob){url=URL.createObjectURL(blob); src=url}}
+  if(!src){say(t("sAudioNone"));return}
+  try{ AUDIO=new Audio(src); AUDIO.__url=url; AUDIO.onended=()=>{stopMusic()}; await AUDIO.play(); S.sPlay=i; render() }catch(e){ stopMusic(); say(t("sAudioErr")) }
+}
+function fileToCell(file){ if(!file) return; const r=new FileReader(); r.onload=()=>setCellImg(r.result).catch(()=>say(t("sImgErr"))); r.readAsDataURL(file) }
+let dwellTimer=null;
+function dwellStart(btn){ if(!SIMPLE.dwell||S.sEdit||window.__dwellLock===btn.dataset.i) return; dwellStop(); btn.classList.add("dwelling"); dwellTimer=setTimeout(()=>{btn.classList.remove("dwelling"); window.__dwellAt=Date.now(); window.__dwellLock=btn.dataset.i; simpleSpeak(+btn.dataset.i)},SIMPLE.dwell) }
+function dwellStop(){ clearTimeout(dwellTimer); dwellTimer=null; document.querySelectorAll(".scell.dwelling").forEach(x=>x.classList.remove("dwelling")) }
+function simpleSpeak(i){
+  const c=curBoard().cells[i]; if(!c) return;
+  if(c.act==="link"&&c.link){ if(/^https?:\/\//i.test(c.link)){ S.sHit=i; render(); window.open(c.link,"_blank","noopener"); setTimeout(()=>{if(S.sHit===i){S.sHit=null;render()}},900) } return }
+  if(c.act==="music"&&(c.audio||c.audioUrl)){ playMusic(i,c); return }
+  let w=c.say||c.text; if(c.descSay&&c.desc) w=w?w+"。"+c.desc:c.desc; if(!w) return;
+  S.sHit=i; speak({hira:w,ruby:w,en:w,icon:""}); setTimeout(()=>{if(S.sHit===i){S.sHit=null;render()}},900);
+}
+
+
+/* ---------- 代弁（支援者が 本人の気持ちを 代わりに ことばにする） ---------- */
+const VCLIPS=[]; let vRec=null, vChunks=[], vStream=null, vSR=null, vSRtext="", vT0=0, vTick=null, vAC=null, vSrc=null;
+const SRCls=window.SpeechRecognition||window.webkitSpeechRecognition;
+const canRec=()=>!!(navigator.mediaDevices&&navigator.mediaDevices.getUserMedia&&window.MediaRecorder);
+function voiceHTML(){
+  const rec=!!vRec;
+  const clips=VCLIPS.map((c,i)=>`<div class="vclip"><div class="row"><b>${i+1}.</b> <span class="note">${c.dur}${t("vSec")}</span>
+     <button class="btn small" data-act="vplay" data-id="${i}" data-m="raw">▶ ${t("vRaw")}</button>
+     <button class="btn small" data-act="vplay" data-id="${i}" data-m="robot">🤖 ${t("vRobot")}</button>
+     <button class="btn small" data-act="vplay" data-id="${i}" data-m="high">⬆ ${t("vHigh")}</button>
+     <button class="btn small" data-act="vplay" data-id="${i}" data-m="low">⬇ ${t("vLow")}</button>
+     <button class="btn small" data-act="vdel" data-id="${i}">🗑</button></div>
+     ${c.text?`<p class="vtx">「${esc(c.text)}」</p><div class="row"><button class="btn small" data-act="vtts" data-id="${i}">🔊 ${t("vTts")}</button><button class="btn small" data-act="vcopy" data-id="${i}">✎ ${t("vCopy")}</button></div>`:""}</div>`).join("");
+  return `<h2>${t("vTitle")}</h2><p class="note">${t("vNote")}</p>
+   <h3 class="rg">⌨ ${t("vType")}</h3>
+   <textarea id="vtext" rows="3" placeholder="${t("vTypePh")}">${esc(S.vtext||"")}</textarea>
+   <div class="row"><button class="btn pri" data-act="vsay">🔊 ${t("speak")}</button><button class="btn" data-act="vbook">＋ ${t("addTo")}</button><button class="btn" data-act="vclr">${t("del")}</button></div>
+   <h3 class="rg">🎙 ${t("vRec")}</h3>
+   ${canRec()?`<div class="row"><button class="btn ${rec?"pri":""}" data-act="vrec" data-key="v-rec">${rec?"■ "+t("vStop"):"🔴 "+t("vStart")}</button><span class="note" id="vtime">${rec?"0"+t("vSec"):""}</span></div>
+   ${SRCls?`<label class="chk"><input type="checkbox" id="v-stt" ${P.vStt?"checked":""}> ${t("vStt")}</label><p class="note">${t("vSttNote")}</p>`:""}
+   <p class="note">${t("vKeep")}</p>${clips}`:`<p class="note">${t("vNoRec")}</p>`}
+   <h3 class="rg">✅ ${t("vCheck")}</h3>
+   <div class="vchk"><button class="btn" data-act="vyes">⭕ ${t("vYes")}</button><button class="btn" data-act="vsome">🤔 ${t("vSome")}</button><button class="btn" data-act="vno">❌ ${t("vNo")}</button></div>`;
+}
+const sayNow=w=>speak({hira:w,ruby:w,en:w,icon:""});
+async function vStart(){
+  try{ vStream=await navigator.mediaDevices.getUserMedia({audio:true}) }catch(e){ say(t("vMicErr")); return }
+  vChunks=[]; vRec=new MediaRecorder(vStream); vRec.ondataavailable=e=>{if(e.data.size) vChunks.push(e.data)};
+  vRec.onstop=()=>{ const blob=new Blob(vChunks,{type:vRec&&vRec.mimeType||"audio/webm"}); VCLIPS.push({blob,url:URL.createObjectURL(blob),text:vSRtext.trim(),dur:Math.max(1,Math.round((Date.now()-vT0)/1000))}); vStream&&vStream.getTracks().forEach(x=>x.stop()); vStream=null; vRec=null; render() };
+  vSRtext=""; if(P.vStt&&SRCls){ try{ vSR=new SRCls(); vSR.lang=P.lang==="en"?"en-US":"ja-JP"; vSR.continuous=true; vSR.interimResults=false; vSR.onresult=e=>{ for(let k=e.resultIndex;k<e.results.length;k++) if(e.results[k].isFinal) vSRtext+=e.results[k][0].transcript }; vSR.start() }catch(e){vSR=null} }
+  vT0=Date.now(); vRec.start(); render();
+  vTick=setInterval(()=>{const el=document.getElementById("vtime"); if(el) el.textContent=Math.round((Date.now()-vT0)/1000)+t("vSec")},500);
+}
+function vStop(){ clearInterval(vTick); if(vSR){try{vSR.stop()}catch(e){} vSR=null} if(vRec&&vRec.state!=="inactive") setTimeout(()=>{try{vRec.stop()}catch(e){}},300) }
+function vStopPlay(){ try{vSrc&&vSrc.stop()}catch(e){} vSrc=null }
+async function vPlay(i,mode){
+  const c=VCLIPS[i]; if(!c) return; vStopPlay(); try{speechSynthesis.cancel()}catch(e){}
+  if(mode==="raw"){ const a=new Audio(c.url); a.play().catch(()=>say(t("sAudioErr"))); return }
+  try{
+    vAC=vAC||new (window.AudioContext||window.webkitAudioContext)(); if(vAC.state==="suspended") await vAC.resume();
+    const buf=c.buf||(c.buf=await vAC.decodeAudioData(await c.blob.arrayBuffer()));
+    const src=vAC.createBufferSource(); src.buffer=buf; vSrc=src;
+    if(mode==="robot"){ const g=vAC.createGain(); g.gain.value=0; const osc=vAC.createOscillator(); osc.frequency.value=50; osc.connect(g.gain); src.connect(g); g.connect(vAC.destination); osc.start(); src.onended=()=>{try{osc.stop()}catch(e){}} }
+    else { src.playbackRate.value=mode==="high"?1.3:0.78; src.connect(vAC.destination) }
+    src.start();
+  }catch(e){ say(t("sAudioErr")) }
+}
+
 /* ---------- 書き出し・読み込み ---------- */
 function download(name,text,type){
   const b=new Blob([text],{type}); const a=document.createElement("a");
@@ -582,7 +802,7 @@ function smallChar(c0){
   for(const [a,b] of SMALL){ const r=c===a?b:(c===b?a:null); if(r) return kata?toKata(r):r }
   return null;
 }
-function sceneExprs(){return (CACHE[P.role]||[]).filter(e=>e.scene===S.scene)}
+function sceneExprs(){return (CACHE[P.role]||[]).filter(e=>e.scene===S.scene&&okSub(e))}
 function predictions(){
   const n=+P.predict; if(!n||!S.buf.trim()) return [];
   const en=isEn()||isAsciiText(S.buf.trim());
@@ -676,9 +896,11 @@ function composeHTML(){
    <p class="note">${t("composeNote")}</p>`;
 }
 function modesHTML(){
-  if(P.compose==="pick"||S.loading||S.err) return "";
-  const cur=S.mode==="pick"?"pick":(isAbc()?(P.abcLayout==="qwerty"?"qwerty":"alpha"):"goj");
-  const items=P.lang==="ja"?[["pick","えらぶ"],["goj","✏️ 五十音"],["alpha","A アルファベット"],["qwerty","⌨ QWERTY"]]:[["pick","Choose"],["alpha","✏️ the Alphabet"],["qwerty","⌨ QWERTY"]];
+  if(S.loading||S.err) return "";
+  const cur=S.mode==="voice"?"voice":S.mode==="pick"?"pick":(isAbc()?(P.abcLayout==="qwerty"?"qwerty":"alpha"):"goj");
+  let items=P.lang==="ja"?[["pick","えらぶ"],["goj","✏️ 五十音"],["alpha","A アルファベット"],["qwerty","⌨ QWERTY"]]:[["pick","Choose"],["alpha","✏️ the Alphabet"],["qwerty","⌨ QWERTY"]];
+  if(P.compose==="pick") items=items.slice(0,1);
+  items.push(["simple",P.lang==="ja"?"▦ かんたん":"▦ Simple"]); items.push(["voice",P.lang==="ja"?"🎙 代弁":"🎙 Voice for me"]);
   return `<div class="modes" role="group" aria-label="にゅうりょく">${items.map(([k,l])=>`<button class="chip" data-act="mode" data-id="${k}" data-key="m-${k}" aria-pressed="${cur===k}">${l}</button>`).join("")}</div>`;
 }
 function updateLive(){
@@ -691,7 +913,7 @@ function updateLive(){
 /* ---------- 描画 ---------- */
 const $a=document.getElementById("app"), $p=document.getElementById("printArea");
 function currentCandidates(){
-  const all=(CACHE[P.role]||[]).filter(e=>e.scene===S.scene&&e.intent===S.intent&&(!S.level||e.level===S.level));
+  const all=(CACHE[P.role]||[]).filter(e=>e.scene===S.scene&&okSub(e)&&e.intent===S.intent&&(!S.level||e.level===S.level));
   return all;
 }
 function tileHTML(e,i,pressed,extra=""){
@@ -713,11 +935,12 @@ function candHTML(){
   const start=S.page*pp, cur=list.slice(start,start+pp);
   const lvl=`<div class="chips" role="group" aria-label="${t("level")}">${t("lv").map((n,i)=>`<button class="chip" data-act="level" data-id="${i}" data-key="l${i}" aria-pressed="${S.level===i}">${esc(n)}</button>`).join("")}</div>`;
   const selId=S.sel&&S.sel.id;
-  return `<h2>${t("level")}</h2>${lvl}
+  const lk=S.scene==="lunch"&&(INDEX.lunchKinds||[]).length?`<h2>${t("lunchKind")}</h2><div class="chips" role="group" aria-label="${t("lunchKind")}">${INDEX.lunchKinds.map(k=>`<button class="chip sm" data-act="lunchkind" data-id="${k.id}" data-key="lk-${k.id}" aria-pressed="${lunchOf(P.role)===k.id}">${disp({hira:k.hira,ruby:k.ruby,en:k.en})}</button>`).join("")}</div>`:"";
+  return `${lk}<h2>${t("level")}</h2>${lvl}
   <p class="note" style="margin:.3rem 0 0">${t("levelHelp")} ● ${esc(t("lv")[1])} ／ ●● ${esc(t("lv")[2])} ／ ●●● ${esc(t("lv")[3])}</p>
   <div class="grid" style="margin-top:.5rem">${cur.map((e,k)=>tileHTML(e,start+k,selId===e.id)).join("")}</div>
   <div class="pager"><button class="btn small" data-act="prev" ${S.page<=0?"disabled":""}>◀ ${t("prev")}</button>
-  <span class="pg">${S.page+1} / ${pages}（${list.length}）</span>
+  <span class="pg">${(()=>{const n=list.length,k=list.findIndex(e=>e.id===selId),e2=Math.min(start+pp,n);if(!n)return "0";if(k>=0)return `${k+1} / ${n}`;return start+1===e2?`${e2} / ${n}`:`${start+1}〜${e2} / ${n}`})()}</span>
   <button class="btn small" data-act="next" ${S.page>=pages-1?"disabled":""}>${t("next")} ▶</button></div>`;
 }
 function speakBtn(big){
@@ -743,7 +966,7 @@ function sentenceInner(){
 }
 function scriptShort(){
   if(P.lang==="en") return "Aa";
-  return P.script==="hira"?"あ":(P.script==="kanji"?"漢":'<ruby>漢<rt>かん</rt></ruby>');
+  return P.script==="hira"?"あ":(P.script==="kanji"?"漢":'<span class="rb">漢<span class="rt">かん</span></span>');
 }
 function dialName(){
   if(!P.dialect||P.dialect==="std") return t("dialShort");
@@ -765,6 +988,7 @@ function headerHTML(){
 }
 function mainHTML(){
   if(S.loading) return `<main class="p1"><div class="pane">${t("loading")}</div></main>`;
+  if(S.mode==="voice") return `<main class="p1"><div class="pane">${voiceHTML()}</div></main>`;
   if(S.err) return `<main class="p1"><div class="pane warn">${t("loadErr")}</div></main>`;
   const L=layoutOf();
   if(S.mode==="make"){
@@ -785,7 +1009,7 @@ function mainHTML(){
   return `<main class="p1"><div class="pane">${crumb}${inner}</div></main>`;
 }
 function barHTML(){
-  if(layoutOf()!=="p1"||S.loading||S.err) return "";
+  if(layoutOf()!=="p1"||S.loading||S.err||S.mode==="voice") return "";
   if(S.mode==="make") return `<nav class="bar" id="bar" aria-label="操作"><button class="btn" data-act="mode" data-id="pick">◀ ${t("modePick")}</button><button class="btn pri" data-act="speak" ${S.sel?"":"disabled"}>🔊 ${t("speak")}</button><button class="btn" data-act="fav">★ ${t("fav")}</button></nav>`;
   return `<nav class="bar" id="bar" aria-label="操作"><button class="btn" data-act="phback" ${S.step==="scene"?"disabled":""}>◀ ${t("back")}</button>
    ${isHeavy(S.sel)?`<button class="btn pri hold" data-act="speakHold" ${S.sel?"":"disabled"}>🔊 ${t("speak")}（${t("hold")}）</button>`:`<button class="btn pri" data-act="speak" ${S.sel?"":"disabled"}>🔊 ${t("speak")}</button>`}
@@ -810,8 +1034,36 @@ function roleListHTML(){
   const rest=INDEX.roles.filter(r=>!used.has(r.id)); if(rest.length) groups.push({h:disp({hira:"ほか",ruby:"ほか",en:"Other"}),rs:rest});
   return groups.filter(g=>g.rs.length).map(g=>`<h3 class="rg">${g.h}</h3><div class="list">${g.rs.map(r=>`<button class="chip" data-act="role" data-id="${r.id}" aria-pressed="${P.role===r.id}">${P.icons?esc(r.icon)+" ":""}${lab(r)}</button>`).join("")}</div>`).join("");
 }
+const WIZ_SAMPLE="先生[せんせい]、教室[きょうしつ]で もう一度[いちど] 説明[せつめい]して ください";
+const WIZ_HIRA="せんせい、 きょうしつで もういちど せつめいして ください";
+function sampleAs(script,lv){const o=P.script,l=P.kLevel;P.script=script;P.kLevel=lv;const h=disp({hira:WIZ_HIRA,ruby:WIZ_SAMPLE,en:""});P.script=o;P.kLevel=l;return h}
+function wizardHTML(){
+  const w=S.wiz||(S.wiz={step:1,script:null,lv:P.kLevel||"g6"});
+  let title,body;
+  const opt=(act,id,lb,ex,on)=>`<button class="opt" data-act="${act}" data-id="${id}" data-key="w-${act}-${id}" aria-pressed="${on}"><span class="lb">${lb}</span><span class="ex">${ex}</span></button>`;
+  if(w.step===1){
+    title="もじを えらんで ください";
+    body=opt("wscript","hira","ひらがな（わかちがき）",esc(WIZ_HIRA),w.script==="hira")+opt("wscript","kanji","かんじ",sampleAs("ruby","all"),w.script==="kanji");
+  }else if(w.step===2){
+    title="どこまで かんじに しますか";
+    const L=[["g2","しょうがっこう 1・2ねん（ていがくねん）まで"],["g4","しょうがっこう 3・4ねん（ちゅうがくねん）まで"],["g6","しょうがっこう 5・6ねん（こうがくねん）まで"],["jh","ちゅうがっこう いじょう（じょうよう かんじ）"],["all","こうとう がっこう いじょう（すべての かんじ）"]];
+    body=L.map(([k,l])=>opt("wlv",k,l,sampleAs("ruby",k),w.lv===k)).join("");
+  }else{
+    title="ふりがなを つけますか";
+    body=opt("wfuri","on","ふりがなを つける",sampleAs("ruby",w.lv),false)+opt("wfuri","off","ふりがなを つけない",sampleAs("kanji",w.lv),false);
+  }
+  const steps=w.script==="hira"?"":`<p class="steps">${w.step} / 3</p>`;
+  const back=w.step>1?`<button class="btn" data-act="wback">◀ もどる</button>`:"";
+  return `<div class="overlay"><div class="sheet" role="dialog" aria-modal="true" aria-label="${esc(title)}">
+   <div class="hd"><h2>${esc(title)}</h2><button class="btn small" data-act="wskip" data-key="p-close">あとで</button></div>
+   ${steps}<p class="note">あとから「せってい」で かえられます。</p><div class="wiz">${body}</div><div class="row" style="margin-top:.6rem">${back}</div></div></div>`;
+}
 function panelHTML(){
+  if(!P.setupDone&&P.lang==="ja") return wizardHTML();
   switch(S.panel){
+  case "scell": return scellSheet();
+  case "sboard": return sboardSheet();
+  case "scam": return scamSheet();
   case "dialpick":
     return sheet(t("dialLabel"),`<div class="list"><button class="chip" data-act="dial" data-id="std" aria-pressed="${!P.dialect||P.dialect==="std"}">${t("dialStd")}</button>${((DIALIDX&&DIALIDX.regions)||[]).map(r=>`<button class="chip" data-act="dial" data-id="${r.id}" aria-pressed="${P.dialect===r.id}">${esc(P.lang==="en"?r.en:r.ja)}（${t(r.status==="draft"?"dialDraft":"dialWanted")}）</button>`).join("")}</div>${dialNote()}<a class="lnk" href="${REQUEST_URL}" target="_blank" rel="noopener noreferrer">${t("dialReq")}</a>`);
   case "rolepick":
@@ -868,6 +1120,9 @@ function settingsHTML(){
     <label class="f">${t("cMail")}</label><input type="email" data-c="${i}" data-f="mail" value="${esc(c.mail||"")}"></details>`}).join("");
   return `<div class="two">
    <div><label class="f" for="s-lang">${t("lang")}</label><select id="s-lang">${opt("ja",P.lang,"日本語")}${opt("en",P.lang,"English")}</select></div>
+   <div><label class="f" for="s-lunch">${t("lunchKind")}</label><select id="s-lunch">${(INDEX.lunchKinds||[]).map(k=>opt(k.id,lunchOf(P.role),plain({hira:k.hira,ruby:k.ruby,en:k.en}))).join("")}</select></div>
+   <div><span class="f">${t("sceneShow")}</span><div class="scchk">${allScenesOf(P.role).map(sc=>`<label><input type="checkbox" id="s-sc-${sc.id}" ${hiddenOf(P.role).includes(sc.id)?"":"checked"}> ${esc(plain({hira:sc.hira,ruby:sc.ruby,en:sc.en}))}</label>`).join("")}</div></div>
+   <div><label class="f" for="s-klv">${t("kLevel")}</label><select id="s-klv">${["g2","g4","g6","jh","all"].map(k=>opt(k,P.kLevel,t("kLevels")[k])).join("")}</select><button class="btn small" data-act="setupagain" style="margin-top:.3rem">${t("setupAgain")}</button></div>
    <div><label class="f" for="s-script">${t("script")}</label><select id="s-script">${["hira","kanji","ruby"].map(k=>opt(k,P.script,t("scripts")[k])).join("")}</select></div>
    <div><label class="f" for="s-dial">${t("dialLabel")}</label><select id="s-dial">${opt("std",P.dialect,t("dialStd"))}${((DIALIDX&&DIALIDX.regions)||[]).map(r=>opt(r.id,P.dialect,(P.lang==="en"?r.en:r.ja)+"（"+t(r.status==="draft"?"dialDraft":"dialWanted")+"）")).join("")}</select>${dialNote()}<a class="lnk" href="${REQUEST_URL}" target="_blank" rel="noopener noreferrer">${t("dialReq")}</a></div>
    <div><label class="f" for="s-dev">${t("device")}</label><select id="s-dev">${opt("auto",DEV.auto?"auto":DEV.type,t("devAuto")+"（"+t("devs")[detectDevice()]+"）")}${["desktop","laptop","tablet","phone"].map(k=>opt(k,DEV.auto?"auto":DEV.type,t("devs")[k])).join("")}</select></div>
@@ -922,6 +1177,7 @@ function render(){
   document.documentElement.dataset.theme=P.theme; document.documentElement.dataset.size=P.size;
   document.documentElement.lang=P.lang;
   document.documentElement.style.setProperty("--tile-min",tileMin()+"px");
+  if(S.mode==="simple"){ $a.innerHTML=simpleHTML()+(INDEX?panelHTML():""); if(lastKey){const el=$a.querySelector(`[data-key="${lastKey}"]`); if(el&&!typing) el.focus({preventScroll:true})} if(S.panel==="scam"&&camStream){const v=document.getElementById("sc-video"); if(v&&v.srcObject!==camStream) v.srcObject=camStream} return }
   $a.innerHTML=headerHTML()+modesHTML()+(INDEX?mainHTML():`<main class="p1"><div class="pane">${t("loading")}</div></main>`)+barHTML()+(INDEX?panelHTML():"");
   if(lastKey){const el=$a.querySelector(`[data-key="${lastKey}"]`); if(el&&!typing) el.focus({preventScroll:true})}
   const f=$a.querySelector('.overlay [data-key="p-close"], .full [data-key="p-close"]');
@@ -962,6 +1218,9 @@ document.addEventListener("click",ev=>{
   case "addbook": if(S.sel){const ok=addToBook(S.sel);S.msg=ok?"★ "+curBook().name:"";render();setTimeout(()=>{S.msg="";render()},1800)}break;
   case "clearsel": S.sel=null; if(S.mode==="make"){S.buf="";S.caret=0} render(); break;
   case "mode":
+    if(S.mode==="voice"&&id!=="voice"){vStop();vStopPlay()}
+    if(id==="voice"){S.mode="voice"; render(); break}
+    if(id==="simple"){S.mode="simple"; S.sEdit=false; P.lastSimple=true; saveProfile(); loadBoardImgs(); render(); break}
     if(id==="pick"){S.mode="pick"; if(S.sel&&S.sel.free)S.sel=null}
     else{
       S.mode="make";
@@ -987,9 +1246,46 @@ document.addEventListener("click",ev=>{
   case "kshift": S.shift=!S.shift; render(); break;
   case "kpred": {const e=predictions()[+b.dataset.i]; if(e){S.buf=(isEn()||isAsciiText(S.buf.trim()))?e.en:(P.inputKind==="kata"?toKata(e.hira):e.hira); S.caret=S.buf.length; syncFree(); render()} break}
   case "phback": S.step=S.step==="expr"?"intent":"scene";render();break;
-  case "closep": S.panel=null;S.msg="";S.form=false;render();break;
+  case "closep": camStop(); if(S.panel==="scell") discardDraft(); S.panel=null;S.msg="";S.form=false;render();break;
   case "rolepick": S.panel="rolepick";render();break;
   case "dialpick": S.panel="dialpick";render();break;
+  case "vsay": {const v=(document.getElementById("vtext")||{}).value||""; S.vtext=v; if(v.trim()) sayNow(v.trim())} break;
+  case "vclr": S.vtext=""; render(); break;
+  case "vbook": {const v=((document.getElementById("vtext")||{}).value||"").trim(); if(v){ ensureBooks(); addToBook({hira:v,ruby:v,en:"",icon:"🎙",intent:"",scene:""}) && say(t("vAdded")) }} break;
+  case "vrec": if(vRec) vStop(); else vStart(); break;
+  case "vplay": vPlay(+id,b.dataset.m); break;
+  case "vdel": {const c=VCLIPS[+id]; if(c){URL.revokeObjectURL(c.url); VCLIPS.splice(+id,1)} render()} break;
+  case "vtts": {const c=VCLIPS[+id]; if(c&&c.text) sayNow(c.text)} break;
+  case "vcopy": {const c=VCLIPS[+id]; if(c&&c.text){S.vtext=c.text; render(); const ta=document.getElementById("vtext"); ta&&ta.focus()}} break;
+  case "vyes": sayNow(t("vYesSay")); break;
+  case "vsome": sayNow(t("vSomeSay")); break;
+  case "vno": sayNow(t("vNoSay")); break;
+  case "scell": if(Date.now()-(window.__dwellAt||0)>1200) simpleSpeak(+b.dataset.i); break;
+  case "sedit": S.sCell=+b.dataset.i; S.sDraft=null; S.panel="scell"; render(); break;
+  case "sact": S.sDraft.act=id; render(); break;
+  case "saudiodel": if(S.sDraft){ if(S.sDraft.audio&&S.sDraft.audio!==curBoard().cells[S.sCell].audio) IDB.del(S.sDraft.audio); S.sDraft.audio=""; S.sDraft.audioName="" } render(); break;
+  case "sexit": case "sedithold": if(ev.detail===0) holdAction(b); else if(!b.classList.contains("holding")){ S.sHint=t("sHoldHint"); render(); setTimeout(()=>{S.sHint="";render()},2200) } break;
+  case "sdone": S.sEdit=false; render(); break;
+  case "sboard": stopMusic(); SIMPLE.cur=(SIMPLE.cur+(+id)+SIMPLE.boards.length)%SIMPLE.boards.length; saveSimple(); loadBoardImgs(); render(); break;
+  case "sbset": S.panel="sboard"; render(); break;
+  case "sbn": {const v=document.getElementById("sb-name"); if(v) curBoard().name=v.value.trim()||curBoard().name} curBoard().n=+id; saveSimple(); render(); break;
+  case "sdw": {const v=document.getElementById("sb-name"); if(v) curBoard().name=v.value.trim()||curBoard().name} SIMPLE.dwell=+id; saveSimple(); render(); break;
+  case "sbsave": {const v=document.getElementById("sb-name"); if(v) curBoard().name=v.value.trim()||curBoard().name} saveSimple(); S.panel=null; render(); break;
+  case "sbadd": stopMusic(); SIMPLE.boards.push({id:uid(),name:(P.lang==="ja"?"ボード ":"Board ")+(SIMPLE.boards.length+1),n:curBoard().n,cells:blankCells()}); SIMPLE.cur=SIMPLE.boards.length-1; saveSimple(); S.panel=null; render(); break;
+  case "sbdel": if(confirm(t("confirmDel"))){ curBoard().cells.forEach(c=>c.img&&IDB.del(c.img)); SIMPLE.boards.splice(SIMPLE.cur,1); SIMPLE.cur=0; saveSimple(); S.panel=null; loadBoardImgs(); render() } break;
+  case "scellsave": {const c=curBoard().cells[S.sCell], d=S.sDraft; if(d){ if(c.img&&c.img!==d.img){IDB.del(c.img);delete IMG[c.img]} if(c.audio&&c.audio!==d.audio) IDB.del(c.audio); d.text=d.text.trim(); d.say=d.say.trim(); d.desc=d.desc.trim(); d.link=d.link.trim(); d.audioUrl=d.audioUrl.trim(); if(d.link&&!/^https?:\/\//i.test(d.link)) d.link="https://"+d.link; curBoard().cells[S.sCell]=d } S.sDraft=null; saveSimple(); S.panel=null; render()} break;
+  case "scellclear": {const c=curBoard().cells[S.sCell]; discardDraft(); if(c.img){IDB.del(c.img);delete IMG[c.img]} if(c.audio) IDB.del(c.audio); curBoard().cells[S.sCell]=CELL0(); saveSimple(); S.panel=null; render()} break;
+  case "simgdel": if(S.sDraft){ if(S.sDraft.img&&S.sDraft.img!==curBoard().cells[S.sCell].img){IDB.del(S.sDraft.img);delete IMG[S.sDraft.img]} S.sDraft.img=""; S.sDraft.desc="" } render(); break;
+  case "scamopen": camOpen(); break;
+  case "scamclose": camStop(); S.panel="scell"; render(); break;
+  case "scamshot": {const v=document.getElementById("sc-video"); if(v&&v.videoWidth){const c=document.createElement("canvas"); c.width=v.videoWidth; c.height=v.videoHeight; c.getContext("2d").drawImage(v,0,0); const d=c.toDataURL("image/jpeg",0.9); camStop(); setCellImg(d)}} break;
+  case "lunchkind": P.lunch=P.lunch||{}; P.lunch[P.role]=id; saveProfile(); S.page=0; S.sel=S.sel&&S.sel.free?S.sel:null; render(); break;
+  case "wscript": if(id==="hira"){P.script="hira";P.scriptUser=true;P.setupDone=true;S.wiz=null;saveProfile()} else {S.wiz.script="kanji";S.wiz.step=2} render(); break;
+  case "wlv": S.wiz.lv=id; S.wiz.step=3; render(); break;
+  case "wfuri": P.kLevel=S.wiz.lv; P.script=id==="on"?"ruby":"kanji"; P.scriptUser=true; P.setupDone=true; S.wiz=null; saveProfile(); render(); break;
+  case "wback": S.wiz.step=Math.max(1,S.wiz.step-1); render(); break;
+  case "wskip": P.setupDone=true; S.wiz=null; saveProfile(); render(); break;
+  case "setupagain": P.setupDone=false; S.wiz=null; S.panel=null; render(); break;
   case "scriptcycle": {const o=["ruby","hira","kanji"]; P.script=o[(o.indexOf(P.script)+1)%3]; P.scriptUser=true; saveProfile(); render(); break}
   case "dial": P.dialect=id; saveProfile(); setDialect(id).then(()=>{S.panel=null;render()}); break;
   case "role": setRole(id);break;
@@ -1024,8 +1320,10 @@ document.addEventListener("click",ev=>{
 function holdAction(btn){
   if(btn.dataset.act==="speakHold"){ if(S.sel){speak(S.sel); if(S.panel==="confirm"){S.panel=null;render()}} }
   else if(btn.dataset.act==="callhold"){ location.href=btn.dataset.href }
+  else if(btn.dataset.act==="sexit"){ stopMusic(); S.mode="pick"; P.lastSimple=false; saveProfile(); dwellStop(); render() }
+  else if(btn.dataset.act==="sedithold"){ S.sEdit=true; dwellStop(); render() }
 }
-document.addEventListener("pointerdown",ev=>{const b=ev.target.closest(".hold[data-act]"); if(b&&(b.dataset.act==="speakHold"||b.dataset.act==="callhold")){ev.preventDefault();holdStart(b,800,()=>holdAction(b))}});
+document.addEventListener("pointerdown",ev=>{const b=ev.target.closest(".hold[data-act]"); if(b&&["speakHold","callhold","sexit","sedithold"].includes(b.dataset.act)){ev.preventDefault();holdStart(b,b.dataset.act[0]==="s"&&b.dataset.act!=="speakHold"?1200:800,()=>holdAction(b))}});
 ["pointerup","pointercancel","pointerleave"].forEach(n=>document.addEventListener(n,ev=>{const b=ev.target.closest&&ev.target.closest(".hold"); if(b) holdCancel(b)},true));
 document.addEventListener("keydown",ev=>{
   const b=ev.target.closest&&ev.target.closest(".hold[data-act]");
@@ -1046,6 +1344,14 @@ document.addEventListener("input",ev=>{
 });
 ["keyup","click","select"].forEach(n=>document.addEventListener(n,ev=>{ if(ev.target.id==="buf") S.caret=ev.target.selectionStart }));
 document.addEventListener("change",ev=>{ if(ev.target.id==="c-scene"){ S.scene=ev.target.value; render() } });
+document.addEventListener("change",ev=>{ const id=ev.target.id;
+  if((id==="sc-cam"||id==="sc-file")&&ev.target.files[0]) fileToCell(ev.target.files[0]);
+  else if(id==="sc-audio"&&ev.target.files[0]) setCellAudio(ev.target.files[0]);
+  else if(id==="sc-descsay"&&S.sDraft) S.sDraft.descSay=ev.target.checked;
+  else if(id==="v-stt"){ P.vStt=ev.target.checked; saveProfile() } });
+document.addEventListener("input",ev=>{ if(ev.target.id==="vtext"){S.vtext=ev.target.value;return} const d=S.sDraft; if(!d) return; const m={"sc-text":"text","sc-say":"say","sc-desc":"desc","sc-link":"link","sc-aurl":"audioUrl"}[ev.target.id]; if(m) d[m]=ev.target.value; });
+document.addEventListener("pointerover",ev=>{ const b=ev.target.closest&&ev.target.closest(".scell[data-act=scell]"); if(b&&!b.contains(ev.relatedTarget)) dwellStart(b) });
+document.addEventListener("pointerout",ev=>{ const b=ev.target.closest&&ev.target.closest(".scell[data-act=scell]"); if(b&&!b.contains(ev.relatedTarget)){ const to=ev.relatedTarget&&ev.relatedTarget.closest&&ev.relatedTarget.closest(".scell"); if(!to||to.dataset.i!==b.dataset.i) window.__dwellLock=null; dwellStop() } });
 /* 設定フォーム */
 document.addEventListener("change",ev=>{
   const el=ev.target, id=el.id||"";
@@ -1054,6 +1360,9 @@ document.addEventListener("change",ev=>{
   if(!id.startsWith("s-")) return;
   if(id==="s-lang")P.lang=el.value;
   else if(id==="s-script"){P.script=el.value;P.scriptUser=true}
+  else if(id==="s-klv")P.kLevel=el.value;
+  else if(id==="s-lunch"){P.lunch=P.lunch||{};P.lunch[P.role]=el.value;S.page=0}
+  else if(id.startsWith("s-sc-")){const sid=id.slice(5);P.hidden=P.hidden||{};let h=[...hiddenOf(P.role)];if(el.checked)h=h.filter(x=>x!==sid);else if(!h.includes(sid))h.push(sid);if(allScenesOf(P.role).every(x=>h.includes(x.id)))h=h.filter(x=>x!==sid);P.hidden[P.role]=h;fixScene();S.page=0}
   else if(id==="s-dial"){P.dialect=el.value; saveProfile(); setDialect(P.dialect).then(()=>render()); return}
   else if(id==="s-dev"){ if(el.value==="auto"){DEV={type:null,auto:true}}else{DEV={type:el.value,auto:false}} saveDev(); S.step="scene" }
   else if(id==="s-size")P.size=el.value;
@@ -1085,7 +1394,7 @@ let rz; addEventListener("resize",()=>{clearTimeout(rz);rz=setTimeout(()=>{ if(I
     await loadDialIndex();
     if(P.dialect&&P.dialect!=="std") await setDialect(P.dialect);
     await loadRole(P.role);
-    const sc=scenesOf(P.role); S.scene=sc[0]&&sc[0].id; S.loading=false; render();
+    const sc=scenesOf(P.role); S.scene=sc[0]&&sc[0].id; S.loading=false; if(P.lastSimple){S.mode="simple"; loadBoardImgs()} render();
   }catch(e){S.loading=false;S.err=true;INDEX=INDEX||{roles:[],scenes:[],intents:[]};render()}
   if("serviceWorker" in navigator&&/^https?:/.test(location.protocol)&&VARIANT==="public"){navigator.serviceWorker.register("sw.js").catch(()=>{})}
 })();
