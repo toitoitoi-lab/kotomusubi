@@ -2,6 +2,8 @@
 <html lang="ja" data-theme="normal">
 <head>
 <meta charset="utf-8">
+<!-- ことむすび KOTOMUSUBI — © 2026 toitoitoi-lab（MARUI Kenji）. 利用のきまりはアプリの「せってい → このアプリについて」にあります。改変したものにも「ことむすびをもとにしています」と分かる表示を残してください。 -->
+<meta name="author" content="toitoitoi-lab（MARUI Kenji）">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#1f4e79">
 <title>ことむすび KOTOMUSUBI</title>
@@ -175,11 +177,13 @@ textarea#buf{resize:vertical}
   .pane{padding:.4rem}
 }
 #printArea{display:none}
+ul.terms{margin:.3rem 0 .6rem;padding-left:1.2rem;line-height:1.6}ul.terms li{margin:.2rem 0}.sheet h4{margin:.6rem 0 .1rem;font-size:.95rem}p.copy{text-align:center;margin-top:1rem}
 @media print{
   #app,.overlay,.full{display:none!important}
   body{background:#fff;color:#000}
   #printArea{display:block}
   #printArea h1{font-size:14pt;margin:0 0 6mm}
+  #printArea .pcopy{margin-top:6mm;font-size:9pt;text-align:right}
   #printArea .pg{display:grid;grid-template-columns:repeat(3,1fr);gap:4mm}
   #printArea .pc{border:2px solid #000;border-radius:3mm;padding:5mm;min-height:40mm;font-size:18pt;font-weight:700;display:flex;gap:3mm;align-items:center;break-inside:avoid}
   #printArea .pc span.ic{font-size:26pt}
@@ -193,7 +197,7 @@ textarea#buf{resize:vertical}
 
 <script>
 "use strict";
-const VERSION="0.6.0", VARIANT="public";
+const VERSION="0.6.1", VARIANT="public";
 
 /* ---------- 文言（日本語／English） ---------- */
 const T={
@@ -294,6 +298,32 @@ const saveContacts=()=>store.set("km.contacts",CONTACTS);
 const saveUsage=()=>store.set("km.usage",USAGE);
 
 /* ---------- ユーティリティ ---------- */
+Object.assign(T.ja,{
+ tmTitle:"はじめに（つかう まえに お読みください）",tmOk:"わかりました",
+ tmPts:["ことむすびは、場面や 気持ちから ことばを 選んで 読み上げる、無料の アプリです。","入力した 文・写真・録音は、この端末の 中だけに 保存されます。外部には 送りません。","実名・顔写真・学校名など、だれか 分かる 情報を 入れるときは、本人・保護者の 同意と、学校や 施設の きまりを 確かめて ください。共用の 端末では、使い終わったら 消して ください。","緊急通報サービスでは ありません。","個人・家庭・学校・福祉・医療の 場で、自由に 使えます。一人ひとりに 合わせた 変更や、教育機関・施設の 中での 改変も 自由です。","次の ときは、事前に ご連絡ください：研修・講演・資料で 紹介する／改変した ものを 外へ 配る／販売する・有料サービスに 組み込む。","改変した ものにも「ことむすび（© toitoitoi-lab／MARUI Kenji）を もとに しています」と 分かる 表示を 残して ください。"],
+ tmMore:"くわしくは「せってい」→「このアプリについて」で いつでも 読めます。",
+ tmFull:"利用のきまり",tmFree:"自由に できること",tmAsk:"事前に 連絡が いること",tmPriv:"個人情報について",tmOther:"そのほか",
+ tmFreeL:["個人・家庭・学校・福祉・医療の 場で 使う（無料）","一人ひとりに 合わせた ことば・ボードの 変更","教育機関・施設が、自分たちの 利用者のために 改変する"],
+ tmAskL:["研修・講演・論文・教材などで 紹介する","改変した ものを、その 機関・施設の 外へ 配る","販売する、有料の サービスや 製品に 組み込む"],
+ tmPrivL:["データは この端末の 中だけに あります（サーバーには 送りません）","実名・顔写真・学校名・声などを 入れるときは、本人・保護者の 同意と 学校・施設の きまりを 確かめる","書き出した ファイルや 印刷物を 渡すときは、中身を 確かめる","共用の 端末では、使い終わったら データを 消す"],
+ tmOtherL:["緊急通報サービスでは ありません","アプリの 利用で 生じた ことについて、作者は 責任を 負いません","改変した ものにも「ことむすび を もとに しています」と © の 表示を 残して ください","ここに 書いていない 権利は 作者が 持っています"],
+ tmContact:"連絡先",tmContactNone:"連絡先フォームは 準備中です。",tmContactGo:"連絡フォームを ひらく",
+ tmDoor:"入口（URL）",tmDoorWeb:"ふだんの 入口（家・個人の 端末など）",tmDoorGas:"学校の 端末で 開けないときの 入口（Google）",tmDoorNote:"入口が ちがうと、保存した データは 別々に なります。うつすときは「データ」の 書き出し・読み込みを 使って ください。",
+ vFile:"ろくおん ファイルを えらぶ",vFileNote:"たんまつの ろくおんアプリ（ボイスメモ など）で とった ファイルを えらぶと、ロボットの こえ などに かえて ながせます。",vGasNote:"この 入口（Google）では、ブラウザで ろくおん できません。下の「ろくおん ファイルを えらぶ」を つかって ください。"
+});
+Object.assign(T.en,{
+ tmTitle:"Before you start",tmOk:"I understand",
+ tmPts:["KOTOMUSUBI is a free app for choosing words by scene and feeling and reading them aloud.","What you type, photos and recordings stay on this device only. Nothing is sent out.","Before adding real names, face photos, school names or anything that identifies someone, get consent from the person or guardian and follow your school's or facility's rules. Clear the data on shared devices after use.","This is not an emergency service.","Free to use at home, at school, and in welfare and medical settings. Personal customization and modification inside an institution are free.","Please contact us beforehand to: introduce it in training, talks or materials; distribute a modified version outside your institution; sell it or include it in a paid service.","Modified versions must keep a notice that they are based on KOTOMUSUBI (© toitoitoi-lab / MARUI Kenji)."],
+ tmMore:"You can read the full terms anytime in Settings → About.",
+ tmFull:"Terms of use",tmFree:"You may freely",tmAsk:"Please contact us first to",tmPriv:"Personal information",tmOther:"Other",
+ tmFreeL:["Use it at home, at school, and in welfare and medical settings (free)","Change words and boards for each person","Modify it inside an institution for its own users"],
+ tmAskL:["Introduce it in training, talks, papers or teaching materials","Distribute a modified version outside the institution","Sell it or include it in paid services or products"],
+ tmPrivL:["Data stays on this device (never sent to a server)","Get consent and follow local rules before adding names, faces, school names or voices","Check the contents before handing over exported files or printouts","Clear the data on shared devices after use"],
+ tmOtherL:["This is not an emergency service","The author is not liable for results of using the app","Modified versions must keep the 'based on KOTOMUSUBI' notice and the © line","All other rights are reserved by the author"],
+ tmContact:"Contact",tmContactNone:"The contact form is being prepared.",tmContactGo:"Open the contact form",
+ tmDoor:"Addresses (URL)",tmDoorWeb:"Usual address (home, personal devices)",tmDoorGas:"If it does not open on school devices (Google)",tmDoorNote:"Each address keeps its own data. Use export / import under Data to move it.",
+ vFile:"Choose a recording file",vFileNote:"Choose a file recorded with the device's recorder app to play it as a robot voice and more.",vGasNote:"Recording in the browser is not available at this address (Google). Use \"Choose a recording file\" below."
+});
 const t=k=>T[P.lang][k];
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const KANJI=/([一-鿿々〆ヶ]+)\[([^\]]+)\]/g;
@@ -358,7 +388,13 @@ async function loadRole(id){
   RAW[id]=j.rows; CACHE[id]=hydrate(id);
 }
 const RAW={}; let DIALIDX=null; const DIAL={id:"std",map:null,rules:null};
-const REQUEST_URL="https://github.com/toitoitoi-lab/kotomusubi/issues/new";
+const IS_GAS=VARIANT==="gas";
+const COPY="© 2026 toitoitoi-lab（MARUI Kenji）";
+const TERMS_VER="2026-10-17";
+const WEB_URL="https://toitoitoi-lab.github.io/kotomusubi/";
+const GAS_URL="".indexOf("{{")===0?"":"";
+const CONTACT_URL="".indexOf("{{")===0?"":"";
+const REQUEST_URL=CONTACT_URL||"https://github.com/toitoitoi-lab/kotomusubi/issues/new";
 const normStd=h=>h.replace(/[\s、。，．！？!?]/g,"");
 function hydrate(id){
   return RAW[id].map(r=>{
@@ -563,7 +599,7 @@ function scellSheet(){
    <label class="f">${t("sPhoto")}</label>
    <div class="sprev">${im?`<img src="${im}" alt="">`:`<span class="note">${t("sNoPhoto")}</span>`}</div>
    <div class="row">
-    ${touch?`<label class="btn" for="sc-cam">📷 ${t("sCam")}</label>`:`<button class="btn" data-act="scamopen">📷 ${t("sCam")}</button>`}
+    ${touch?`<label class="btn" for="sc-cam">📷 ${t("sCam")}</label>`:(IS_GAS?"":`<button class="btn" data-act="scamopen">📷 ${t("sCam")}</button>`)}
     <label class="btn" for="sc-file">🖼 ${t("sFile")}</label>
     ${im?`<button class="btn" data-act="simgdel">${t("sPhotoDel")}</button>`:""}
    </div>
@@ -643,10 +679,10 @@ function simpleSpeak(i){
 /* ---------- 代弁（支援者が 本人の気持ちを 代わりに ことばにする） ---------- */
 const VCLIPS=[]; let vRec=null, vChunks=[], vStream=null, vSR=null, vSRtext="", vT0=0, vTick=null, vAC=null, vSrc=null;
 const SRCls=window.SpeechRecognition||window.webkitSpeechRecognition;
-const canRec=()=>!!(navigator.mediaDevices&&navigator.mediaDevices.getUserMedia&&window.MediaRecorder);
+const canRec=()=>!IS_GAS&&!!(navigator.mediaDevices&&navigator.mediaDevices.getUserMedia&&window.MediaRecorder);
 function voiceHTML(){
   const rec=!!vRec;
-  const clips=VCLIPS.map((c,i)=>`<div class="vclip"><div class="row"><b>${i+1}.</b> <span class="note">${c.dur}${t("vSec")}</span>
+  const clips=VCLIPS.map((c,i)=>`<div class="vclip"><div class="row"><b>${i+1}.</b> <span class="note">${c.dur?c.dur+t("vSec"):esc(c.name||"")}</span>
      <button class="btn small" data-act="vplay" data-id="${i}" data-m="raw">▶ ${t("vRaw")}</button>
      <button class="btn small" data-act="vplay" data-id="${i}" data-m="robot">🤖 ${t("vRobot")}</button>
      <button class="btn small" data-act="vplay" data-id="${i}" data-m="high">⬆ ${t("vHigh")}</button>
@@ -660,7 +696,10 @@ function voiceHTML(){
    <h3 class="rg">🎙 ${t("vRec")}</h3>
    ${canRec()?`<div class="row"><button class="btn ${rec?"pri":""}" data-act="vrec" data-key="v-rec">${rec?"■ "+t("vStop"):"🔴 "+t("vStart")}</button><span class="note" id="vtime">${rec?"0"+t("vSec"):""}</span></div>
    ${SRCls?`<label class="chk"><input type="checkbox" id="v-stt" ${P.vStt?"checked":""}> ${t("vStt")}</label><p class="note">${t("vSttNote")}</p>`:""}
-   <p class="note">${t("vKeep")}</p>${clips}`:`<p class="note">${t("vNoRec")}</p>`}
+   `:`<p class="note">${IS_GAS?t("vGasNote"):t("vNoRec")}</p>`}
+   <div class="row"><label class="btn" for="v-file">📂 ${t("vFile")}</label></div><input type="file" id="v-file" accept="audio/*,video/*,.m4a,.mp3,.wav,.webm" hidden>
+   <p class="note">${t("vFileNote")}</p>
+   <p class="note">${t("vKeep")}</p>${clips}
    <h3 class="rg">✅ ${t("vCheck")}</h3>
    <div class="vchk"><button class="btn" data-act="vyes">⭕ ${t("vYes")}</button><button class="btn" data-act="vsome">🤔 ${t("vSome")}</button><button class="btn" data-act="vno">❌ ${t("vNo")}</button></div>`;
 }
@@ -753,7 +792,7 @@ async function importFile(file,mode){
 /* ---------- 印刷 ---------- */
 function printBook(){
   const b=curBook(); if(!b) return;
-  $p.innerHTML=`<h1>${esc(b.name)}</h1><div class="pg">`+b.items.map(i=>`<div class="pc"><span class="ic">${esc(P.icons?i.icon:"")}</span><span>${disp(i)}</span></div>`).join("")+"</div>";
+  $p.innerHTML=`<h1>${esc(b.name)}</h1><div class="pg">`+b.items.map(i=>`<div class="pc"><span class="ic">${esc(P.icons?i.icon:"")}</span><span>${disp(i)}</span></div>`).join("")+`</div><p class="pcopy">ことむすび KOTOMUSUBI ${COPY}</p>`;
   setTimeout(()=>window.print(),50);
 }
 
@@ -975,7 +1014,7 @@ function dialName(){
 function headerHTML(){
   const r=INDEX&&roleObj(P.role);
   return `<header class="top">
-   <h1>${t("app")}<small>${t("tag")}</small><span class="ver" aria-label="version">v${VERSION}${VARIANT==="private"?" private":""}</span></h1>
+   <h1>${t("app")}<small>${t("tag")}</small><span class="ver" aria-label="version">v${VERSION}${VARIANT==="private"?" private":IS_GAS?" G":""}</span></h1>
    <button class="hbtn" data-act="rolepick" data-key="h-role" aria-haspopup="dialog">${r?label(r):""} ▾</button>
    <button class="hbtn" data-act="scriptcycle" data-key="h-script" aria-label="${t("script")}：${P.lang==="en"?"":t("scripts")[P.script]}" title="${t("script")}：${P.lang==="en"?"":t("scripts")[P.script]}">${scriptShort()}</button>
    <button class="hbtn ${P.dialect&&P.dialect!=="std"?"on":""}" data-act="dialpick" data-key="h-dial" aria-haspopup="dialog">🗣 ${dialName()} ▾</button>
@@ -1058,7 +1097,24 @@ function wizardHTML(){
    <div class="hd"><h2>${esc(title)}</h2><button class="btn small" data-act="wskip" data-key="p-close">あとで</button></div>
    ${steps}<p class="note">あとから「せってい」で かえられます。</p><div class="wiz">${body}</div><div class="row" style="margin-top:.6rem">${back}</div></div></div>`;
 }
+function termsHTML(){
+  return `<div class="overlay"><div class="sheet" role="dialog" aria-modal="true" aria-label="${esc(t("tmTitle"))}">
+   <div class="hd"><h2>${t("tmTitle")}</h2></div>
+   <ul class="terms">${t("tmPts").map(x=>`<li>${esc(x)}</li>`).join("")}</ul>
+   <p class="note">${t("tmMore")}</p><p class="note">${COPY}</p>
+   <div class="row" style="margin-top:.6rem"><button class="btn pri" data-act="termsok" data-key="p-terms">✔ ${t("tmOk")}</button></div></div></div>`;
+}
+function aboutHTML(){
+  const L=a=>`<ul class="terms">${t(a).map(x=>`<li>${esc(x)}</li>`).join("")}</ul>`;
+  const door=(lb,u)=>u?`<p class="note">${lb}<br><a class="lnk" href="${u}" target="_blank" rel="noopener noreferrer">${esc(u)}</a></p>`:"";
+  return `<p class="note">${t("privacy")}</p><p class="note">${t("emergency")}</p>
+   <h3 class="rg">${t("tmFull")}</h3>
+   <h4>${t("tmFree")}</h4>${L("tmFreeL")}<h4>${t("tmAsk")}</h4>${L("tmAskL")}<h4>${t("tmPriv")}</h4>${L("tmPrivL")}<h4>${t("tmOther")}</h4>${L("tmOtherL")}
+   <h3 class="rg">${t("tmContact")}</h3>${CONTACT_URL?`<a class="lnk" href="${CONTACT_URL}" target="_blank" rel="noopener noreferrer">${t("tmContactGo")}</a>`:`<p class="note">${t("tmContactNone")}</p>`}
+   <h3 class="rg">${t("tmDoor")}</h3>${door(t("tmDoorWeb"),WEB_URL)}${door(t("tmDoorGas"),GAS_URL)}<p class="note">${t("tmDoorNote")}</p>`;
+}
 function panelHTML(){
+  if(P.termsOk!==TERMS_VER) return termsHTML();
   if(!P.setupDone&&P.lang==="ja") return wizardHTML();
   switch(S.panel){
   case "scell": return scellSheet();
@@ -1147,7 +1203,8 @@ function settingsHTML(){
    <label class="f">${t("importF")}（.json / .csv）</label><input type="file" id="s-file" accept=".json,.csv,application/json,text/csv">
    <div class="row"><label><input type="radio" name="s-mode" value="append" checked> ${t("append")}</label><label><input type="radio" name="s-mode" value="replace"> ${t("replace")}</label></div>
    ${S.msg?`<p class="note" role="status">${esc(S.msg)}</p>`:""}</details>
-  <details data-auto data-d="about" ${S.open.about?"open":""}><summary>${t("about")}</summary><p class="note">${t("privacy")}</p><p class="note">${t("emergency")}</p><p class="note">KOTOMUSUBI ${VERSION} (${VARIANT}) — toi toi toi</p></details>`;
+  <details data-auto data-d="about" ${S.open.about?"open":""}><summary>${t("about")}</summary>${aboutHTML()}</details>
+  <p class="note copy">ことむすび KOTOMUSUBI v${VERSION} (${VARIANT}) ${COPY}</p>`;
 }
 function bookItemHTML(it,idx,n){
   const t0=`<button class="tile" data-act="pickbook" data-id="${it.id}">${P.icons?`<span class="ic">${esc(it.icon)}</span>`:""}<span class="tx">${disp(it)}</span></button>`;
@@ -1284,6 +1341,7 @@ document.addEventListener("click",ev=>{
   case "wlv": S.wiz.lv=id; S.wiz.step=3; render(); break;
   case "wfuri": P.kLevel=S.wiz.lv; P.script=id==="on"?"ruby":"kanji"; P.scriptUser=true; P.setupDone=true; S.wiz=null; saveProfile(); render(); break;
   case "wback": S.wiz.step=Math.max(1,S.wiz.step-1); render(); break;
+  case "termsok": P.termsOk=TERMS_VER; saveProfile(); render(); break;
   case "wskip": P.setupDone=true; S.wiz=null; saveProfile(); render(); break;
   case "setupagain": P.setupDone=false; S.wiz=null; S.panel=null; render(); break;
   case "scriptcycle": {const o=["ruby","hira","kanji"]; P.script=o[(o.indexOf(P.script)+1)%3]; P.scriptUser=true; saveProfile(); render(); break}
@@ -1346,6 +1404,7 @@ document.addEventListener("input",ev=>{
 document.addEventListener("change",ev=>{ if(ev.target.id==="c-scene"){ S.scene=ev.target.value; render() } });
 document.addEventListener("change",ev=>{ const id=ev.target.id;
   if((id==="sc-cam"||id==="sc-file")&&ev.target.files[0]) fileToCell(ev.target.files[0]);
+  if(id==="v-file"&&ev.target.files[0]){ const f=ev.target.files[0]; VCLIPS.push({blob:f,url:URL.createObjectURL(f),text:"",dur:0,name:f.name}); render() }
   else if(id==="sc-audio"&&ev.target.files[0]) setCellAudio(ev.target.files[0]);
   else if(id==="sc-descsay"&&S.sDraft) S.sDraft.descSay=ev.target.checked;
   else if(id==="v-stt"){ P.vStt=ev.target.checked; saveProfile() } });
